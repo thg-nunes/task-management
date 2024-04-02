@@ -1,0 +1,18 @@
+{
+  "name": "task-management",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "nodemon -r tsconfig-paths/register src/index.ts"
+  },
+  "keywords": [],
+  "author": "thiago nunes",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.3",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.3"
+  }
+}
