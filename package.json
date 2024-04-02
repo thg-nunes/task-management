@@ -1,9 +1,9 @@
 {
   "name": "task-management",
   "version": "1.0.0",
-  "description": "",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon -r tsconfig-paths/register src/index.ts"
+    "dev": "nodemon --esm -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "thiago nunes",
@@ -19,5 +19,9 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.10.2",
+    "graphql": "^16.8.1"
   }
 }
