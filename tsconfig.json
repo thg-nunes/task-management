@@ -3,10 +3,14 @@
     "rootDirs": ["src"],
     "outDir": "dist",
     "lib": ["es2020"],
+    "baseUrl": ".",
     "target": "es2020",
     "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@services/*": ["src/services/*"]
+    }
   }
 }
