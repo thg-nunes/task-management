@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "types": ["node"],
     "paths": {
-      "@services/*": ["src/services/*"]
+      "@schema/*": ["src/graphql/schema/*"]
     }
   }
 }

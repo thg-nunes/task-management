@@ -1,21 +1,12 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 
-const rootTypeDefs = `#graphql
-  type Query {
-    _empty: Boolean!
-  }
-`
-
-const rootResolvers = {
-  Query: {
-    _empty: () => true,
-  },
-}
+import { resolvers, typeDefs } from '@schema/index'
+import { UsersDataSource } from '@schema/users/datasources'
 
 const server = new ApolloServer({
-  typeDefs: [rootTypeDefs],
-  resolvers: [rootResolvers],
+  typeDefs,
+  resolvers,
 })
 
 startStandaloneServer(server, {
