@@ -21,12 +21,12 @@ export class UsersDataSource
   async createUser({ userData }: CreateUserData): Promise<User> {
     const usernameAlreadyExists = await this.db.users.findUnique({
       where: {
-        username: userData.username,
+        email: userData.email,
       },
     })
 
     if (usernameAlreadyExists) {
-      throw new Error(`Username "${userData.username}" já existe, use outro.`)
+      throw new Error(`O email "${userData.email}" já extá cadastrado.`)
     }
 
     const encryptedPassword = await passwordHash(userData.password)
@@ -49,12 +49,12 @@ export class UsersDataSource
     updatePassword,
   }: UpdatePasswordInput): Promise<boolean> {
     const userExists = await this.db.users.findUnique({
-      where: { username: updatePassword.username },
+      where: { email: updatePassword.email },
       select: { password: true },
     })
 
     if (!userExists)
-      throw new Error(`Usuário "${updatePassword.username}" não existe.`)
+      throw new Error(`Usuário emeail "${updatePassword.email}" não existe.`)
 
     const passwordIsCorrect = await passwordCompareHash({
       password: updatePassword.old_password,
@@ -68,7 +68,7 @@ export class UsersDataSource
     const encryptedPassword = await passwordHash(updatePassword.new_password)
 
     const passwordIsUpdate = await this.db.users.update({
-      where: { username: updatePassword.username },
+      where: { email: updatePassword.email },
       data: { password: encryptedPassword },
     })
 

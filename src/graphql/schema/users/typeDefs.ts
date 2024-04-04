@@ -19,7 +19,7 @@ export const usersTypeDefs = `#graphql
   }
 
   input UpdatePasswordInput {
-    username: String!
+    email: String!
     old_password: String!
     new_password: String!
   }
