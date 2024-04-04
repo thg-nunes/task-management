@@ -1,6 +1,16 @@
 import { Context } from '@context/types'
 import { CreateUserInput, UpdatePasswordInput } from './types'
 
+// Query Resolvers
+const userByEmailExists = async (
+  _,
+  { email }: { email: string },
+  { dataSources }: Context,
+) => {
+  return await dataSources.usersDataSource.userByEmailExists(email)
+}
+
+// Mutations Resolvers
 const createUser = async (
   _,
   { userData }: CreateUserInput,
@@ -18,5 +28,6 @@ const updatePassword = async (
 }
 
 export const usersResolvers = {
+  Query: { userByEmailExists },
   Mutation: { createUser, updatePassword },
 }

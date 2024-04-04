@@ -7,6 +7,7 @@ type CreateUserData = Pick<CreateUserInput, 'userData'>
 
 export interface UsersDataSourceServices {
   createUser({ userData }: CreateUserData): Promise<User>
+  userByEmailExists(email: string): Promise<boolean>
   updatePassword({ updatePassword }: UpdatePasswordInput): Promise<boolean>
 }
 
@@ -73,5 +74,13 @@ export class UsersDataSource
     })
 
     return !!passwordIsUpdate.id
+  }
+
+  async userByEmailExists(email: string): Promise<boolean> {
+    const user = await this.db.users.findFirst({ where: { email } })
+
+    if (!user) throw new Error('Usuário informado não existe.')
+
+    return !!user.email
   }
 }
