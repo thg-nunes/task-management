@@ -1,6 +1,7 @@
 export const usersTypeDefs = `#graphql
   extend type Mutation {
     createUser(userData: CreateUserInput!): User!
+    updatePassword(updatePassword: UpdatePasswordInput!): Boolean!
   }
 
   type User {
@@ -15,5 +16,11 @@ export const usersTypeDefs = `#graphql
     username: String!
     email: String!
     password: String!
+  }
+
+  input UpdatePasswordInput {
+    username: String!
+    old_password: String!
+    new_password: String!
   }
 `

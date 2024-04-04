@@ -2,8 +2,8 @@ export type User = {
   id: string
   username: string
   email: string
-  created_at: string
-  updated_at: string
+  created_at: Date
+  updated_at: Date
 }
 
 export type CreateUserInput = {
@@ -11,5 +11,13 @@ export type CreateUserInput = {
     username: string
     email: string
     password: string
+  }
+}
+
+export type UpdatePasswordInput = {
+  updatePassword: {
+    username: string
+    old_password: string
+    new_password: string
   }
 }
