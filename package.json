@@ -1,9 +1,8 @@
 {
   "name": "task-management",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon --esm -r tsconfig-paths/register src/index.ts"
+    "dev": "ts-node-dev --respawn -r tsconfig-paths/register ./src/index.ts"
   },
   "keywords": [],
   "author": "thiago nunes",
@@ -14,10 +13,10 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "nodemon": "^3.1.0",
     "pretier": "^0.0.1",
     "prisma": "^5.12.0",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.3"
   },
