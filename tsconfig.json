@@ -11,6 +11,7 @@
     "types": ["node"],
     "paths": {
       "@services/*": ["src/services/*"],
+      "@utils/*": ["src/utils/*"],
       "@context/*": ["src/graphql/context/*"],
       "@dataSources/*": ["src/graphql/dataSources/*"],
       "@schema/*": ["src/graphql/schema/*"]
