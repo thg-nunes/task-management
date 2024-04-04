@@ -2,12 +2,13 @@
   "name": "task-management",
   "version": "1.0.0",
   "scripts": {
-    "dev": "ts-node-dev --respawn -r tsconfig-paths/register ./src/index.ts"
+    "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register ./src/index.ts"
   },
   "keywords": [],
   "author": "thiago nunes",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.12.3",
     "@typescript-eslint/parser": "^7.5.0",
     "eslint": "^8.57.0",
@@ -23,6 +24,8 @@
   "dependencies": {
     "@apollo/server": "^4.10.2",
     "@prisma/client": "^5.12.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
     "graphql": "^16.8.1"
   }
 }
