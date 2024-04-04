@@ -12,6 +12,7 @@ const server = new ApolloServer({
 startStandaloneServer(server, {
   context: async ({ req, res }) => {
     return {
+      res,
       dataSources: {
         usersDataSource: new UsersDataSource(),
       },

@@ -1,5 +1,10 @@
 import { Context } from '@context/types'
-import { CreateUserInput, UpdatePasswordInput } from './types'
+import {
+  CreateUserInput,
+  SignInput,
+  SignResponse,
+  UpdatePasswordInput,
+} from './types'
 
 // Query Resolvers
 const userByEmailExists = async (
@@ -11,6 +16,22 @@ const userByEmailExists = async (
 }
 
 // Mutations Resolvers
+const sign = async (
+  _,
+  { signData }: SignInput,
+  { dataSources, res }: Context,
+): Promise<SignResponse> => {
+  const { token, refresh_token } = await dataSources.usersDataSource.sign({
+    signData,
+  })
+  res.setHeader('Set-Cookie', [
+    `authToken=${token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+    `refresh_token=${refresh_token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+  ])
+
+  return { token, refresh_token }
+}
+
 const createUser = async (
   _,
   { userData }: CreateUserInput,
@@ -29,5 +50,5 @@ const updatePassword = async (
 
 export const usersResolvers = {
   Query: { userByEmailExists },
-  Mutation: { createUser, updatePassword },
+  Mutation: { sign, createUser, updatePassword },
 }
