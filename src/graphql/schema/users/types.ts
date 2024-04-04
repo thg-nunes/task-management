@@ -21,3 +21,15 @@ export type UpdatePasswordInput = {
     new_password: string
   }
 }
+
+export type SignInput = {
+  signData: {
+    email: string
+    password: string
+  }
+}
+
+export type SignResponse = {
+  token: string
+  refresh_token: string
+}

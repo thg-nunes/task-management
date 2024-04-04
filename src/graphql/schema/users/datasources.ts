@@ -1,13 +1,21 @@
+import jwt from 'jsonwebtoken'
 import { passwordCompareHash, passwordHash } from '@utils/bcrypts'
 
 import { PostgresDataSource } from '@dataSources/postgres'
-import { CreateUserInput, UpdatePasswordInput, User } from './types'
+import {
+  CreateUserInput,
+  SignInput,
+  SignResponse,
+  UpdatePasswordInput,
+  User,
+} from './types'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
 export interface UsersDataSourceServices {
   createUser({ userData }: CreateUserData): Promise<User>
   userByEmailExists(email: string): Promise<boolean>
+  sign(signData: SignInput): Promise<SignResponse>
   updatePassword({ updatePassword }: UpdatePasswordInput): Promise<boolean>
 }
 
@@ -20,13 +28,13 @@ export class UsersDataSource
   }
 
   async createUser({ userData }: CreateUserData): Promise<User> {
-    const usernameAlreadyExists = await this.db.users.findUnique({
+    const emailAlreadyExists = await this.db.users.findUnique({
       where: {
         email: userData.email,
       },
     })
 
-    if (usernameAlreadyExists) {
+    if (emailAlreadyExists) {
       throw new Error(`O email "${userData.email}" já extá cadastrado.`)
     }
 
@@ -82,5 +90,56 @@ export class UsersDataSource
     if (!user) throw new Error('Usuário informado não existe.')
 
     return !!user.email
+  }
+
+  async sign({ signData }: SignInput): Promise<SignResponse> {
+    const user = await this.db.users.findUnique({
+      where: {
+        email: signData.email,
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        password: true,
+        created_at: true,
+        updated_at: true,
+      },
+    })
+
+    if (!user) throw new Error('Email ou senha incorreta.')
+
+    const passwordIsCorrect = await passwordCompareHash({
+      password: signData.password,
+      passwordHash: user.password,
+    })
+
+    if (!passwordIsCorrect) throw new Error('Email ou senha incorreta.')
+
+    const user_jwt = jwt.sign(
+      { user_id: user.id, user_email: user.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '15m', // expires in 15 minutes
+      },
+    )
+
+    const user_refresh_token = jwt.sign(
+      { user_id: user.id, user_email: user.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '2d', // expires in 2 days
+      },
+    )
+
+    await this.db.users.update({
+      data: { token: user_jwt, refresh_token: user_refresh_token },
+      where: { email: user.email },
+    })
+
+    return {
+      token: user_jwt,
+      refresh_token: user_refresh_token,
+    }
   }
 }
