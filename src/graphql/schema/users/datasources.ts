@@ -1,12 +1,13 @@
 import { passwordCompareHash, passwordHash } from '@utils/bcrypts'
 
 import { PostgresDataSource } from '@dataSources/postgres'
-import { CreateUserInput } from './types'
+import { CreateUserInput, UpdatePasswordInput, User } from './types'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
 export interface UsersDataSourceServices {
   createUser({ userData }: CreateUserData): Promise<User>
+  updatePassword({ updatePassword }: UpdatePasswordInput): Promise<boolean>
 }
 
 export class UsersDataSource
@@ -42,5 +43,35 @@ export class UsersDataSource
         updated_at: true,
       },
     })
+  }
+
+  async updatePassword({
+    updatePassword,
+  }: UpdatePasswordInput): Promise<boolean> {
+    const userExists = await this.db.users.findUnique({
+      where: { username: updatePassword.username },
+      select: { password: true },
+    })
+
+    if (!userExists)
+      throw new Error(`Usuário "${updatePassword.username}" não existe.`)
+
+    const passwordIsCorrect = await passwordCompareHash({
+      password: updatePassword.old_password,
+      passwordHash: userExists.password,
+    })
+
+    if (!passwordIsCorrect) {
+      throw new Error('A senha que você mandou está incorreta.')
+    }
+
+    const encryptedPassword = await passwordHash(updatePassword.new_password)
+
+    const passwordIsUpdate = await this.db.users.update({
+      where: { username: updatePassword.username },
+      data: { password: encryptedPassword },
+    })
+
+    return !!passwordIsUpdate.id
   }
 }

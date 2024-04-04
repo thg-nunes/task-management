@@ -1,5 +1,5 @@
 import { Context } from '@context/types'
-import { CreateUserInput } from './types'
+import { CreateUserInput, UpdatePasswordInput } from './types'
 
 const createUser = async (
   _,
@@ -9,6 +9,14 @@ const createUser = async (
   return await dataSources.usersDataSource.createUser({ userData })
 }
 
+const updatePassword = async (
+  _,
+  { updatePassword }: UpdatePasswordInput,
+  { dataSources }: Context,
+) => {
+  return await dataSources.usersDataSource.updatePassword({ updatePassword })
+}
+
 export const usersResolvers = {
-  Mutation: { createUser },
+  Mutation: { createUser, updatePassword },
 }
