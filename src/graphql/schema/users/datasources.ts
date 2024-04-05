@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { IncomingMessage, ServerResponse } from 'http'
 import { passwordCompareHash, passwordHash } from '@utils/bcrypts'
 
 import { PostgresDataSource } from '@dataSources/postgres'
@@ -20,7 +21,10 @@ export interface UsersDataSourceServices {
     token: string
     refresh_token: string
   }>
-  createUser({ userData }: CreateUserData): Promise<User>
+  createUser(
+    { userData }: CreateUserData,
+    res: ServerResponse<IncomingMessage>,
+  ): Promise<User>
   updateProfile(
     { userUpdateProfile }: UserUpdateProfileInput,
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
@@ -38,7 +42,10 @@ export class UsersDataSource
     super()
   }
 
-  async createUser({ userData }: CreateUserData): Promise<User> {
+  async createUser(
+    { userData }: CreateUserData,
+    res: ServerResponse<IncomingMessage>,
+  ): Promise<User> {
     const emailAlreadyExists = await this.db.users.findUnique({
       where: {
         email: userData.email,
@@ -56,6 +63,11 @@ export class UsersDataSource
     const token = createJWT({ user_email: userData.email })
 
     const refresh_token = createJWT({ user_email: userData.email })
+
+    res.setHeader('Set-Cookie', [
+      `authToken=${token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+      `refresh_token=${refresh_token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+    ])
 
     return await this.db.users.create({
       data: { ...userData, token, refresh_token },

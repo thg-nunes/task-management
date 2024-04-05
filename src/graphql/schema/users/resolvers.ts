@@ -35,9 +35,9 @@ const sign = async (
 const createUser = async (
   _,
   { userData }: CreateUserInput,
-  { dataSources }: Context,
+  { dataSources, res }: Context,
 ) => {
-  return await dataSources.usersDataSource.createUser({ userData })
+  return await dataSources.usersDataSource.createUser({ userData }, res)
 }
 
 const updatePassword = async (
