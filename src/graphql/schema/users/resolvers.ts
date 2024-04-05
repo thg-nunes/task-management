@@ -3,7 +3,7 @@ import {
   CreateUserInput,
   SignInput,
   SignResponse,
-  UpdatePasswordInput,
+  UserUpdateProfileInput,
 } from './types'
 
 // Query Resolvers
@@ -38,14 +38,6 @@ const createUser = async (
   { dataSources, res }: Context,
 ) => {
   return await dataSources.usersDataSource.createUser({ userData }, res)
-}
-
-const updatePassword = async (
-  _,
-  { updatePassword }: UpdatePasswordInput,
-  { dataSources }: Context,
-) => {
-  return await dataSources.usersDataSource.updatePassword({ updatePassword })
 }
 
 const updateProfile = async (

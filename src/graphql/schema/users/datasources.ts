@@ -86,36 +86,6 @@ export class UsersDataSource
     return !!userDeleted.id
   }
 
-  async updatePassword({
-    updatePassword,
-  }: UpdatePasswordInput): Promise<boolean> {
-    const userExists = await this.db.users.findUnique({
-      where: { email: updatePassword.email },
-      select: { password: true },
-    })
-
-    if (!userExists)
-      throw new Error(`Usuário emeail "${updatePassword.email}" não existe.`)
-
-    const passwordIsCorrect = await passwordCompareHash({
-      password: updatePassword.old_password,
-      passwordHash: userExists.password,
-    })
-
-    if (!passwordIsCorrect) {
-      throw new Error('A senha que você mandou está incorreta.')
-    }
-
-    const encryptedPassword = await passwordHash(updatePassword.new_password)
-
-    const passwordIsUpdate = await this.db.users.update({
-      where: { email: updatePassword.email },
-      data: { password: encryptedPassword },
-    })
-
-    return !!passwordIsUpdate.id
-  }
-
   async userByEmailExists(email: string): Promise<boolean> {
     const user = await this.db.users.findFirst({ where: { email } })
 
@@ -209,7 +179,6 @@ export class UsersDataSource
 
     if (fieldsToUpdate.includes('email')) {
       updatedToken = createJWT({
-        user_id: userIsLoggedIn.user_id,
         user_email: userUpdateProfile.email,
       })
     }
