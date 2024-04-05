@@ -75,5 +75,5 @@ const deleteProfile = async (
 
 export const usersResolvers = {
   Query: { userByEmailExists },
-  Mutation: { sign, createUser, updatePassword, updateProfile, deleteProfile },
+  Mutation: { sign, createUser, updateProfile, deleteProfile },
 }
