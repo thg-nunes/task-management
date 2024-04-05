@@ -9,6 +9,7 @@ import {
   UpdatePasswordInput,
   User,
 } from './types'
+import { createJWT } from '@utils/jwt'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
@@ -123,15 +124,12 @@ export class UsersDataSource
     if (!passwordIsCorrect) throw new Error('Email ou senha incorreta.')
 
     if (!user.token && !user.refresh_token) {
-      const user_jwt = jwt.sign(
-        { user_id: user.id, user_email: user.email },
-        process.env.JWT_SECRET,
-      )
+      const user_jwt = createJWT({ user_id: user.id, user_email: user.email })
 
-      const user_refresh_token = jwt.sign(
-        { user_id: user.id, user_email: user.email },
-        process.env.JWT_SECRET,
-      )
+      const user_refresh_token = createJWT({
+        user_id: user.id,
+        user_email: user.email,
+      })
 
       await this.db.users.update({
         data: { token: user_jwt, refresh_token: user_refresh_token },
