@@ -7,6 +7,7 @@ export const usersTypeDefs = `#graphql
     sign(signData: SignInput!): SignResponse!
     createUser(userData: CreateUserInput!): User!
     updatePassword(updatePassword: UpdatePasswordInput!): Boolean!
+    updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
   }
 
   input SignInput {
@@ -37,5 +38,11 @@ export const usersTypeDefs = `#graphql
     email: String!
     old_password: String!
     new_password: String!
+  }
+
+  input UserUpdateProfileInput {
+    email: String
+    username: String
+    password: String
   }
 `
