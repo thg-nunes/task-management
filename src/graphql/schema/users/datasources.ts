@@ -7,7 +7,6 @@ import {
   CreateUserInput,
   SignInput,
   SignResponse,
-  UpdatePasswordInput,
   User,
   UserUpdateProfileInput,
 } from './types'
@@ -21,6 +20,7 @@ export interface UsersDataSourceServices {
     token: string
     refresh_token: string
   }>
+  deleteProfile(userEmail: string): Promise<Boolean>
   createUser(
     { userData }: CreateUserData,
     res: ServerResponse<IncomingMessage>,
