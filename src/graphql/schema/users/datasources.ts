@@ -81,6 +81,11 @@ export class UsersDataSource
     })
   }
 
+  async deleteProfile(email: string) {
+    const userDeleted = await this.db.users.delete({ where: { email } })
+    return !!userDeleted.id
+  }
+
   async updatePassword({
     updatePassword,
   }: UpdatePasswordInput): Promise<boolean> {

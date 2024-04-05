@@ -8,6 +8,7 @@ export const usersTypeDefs = `#graphql
     createUser(userData: CreateUserInput!): User!
     updatePassword(updatePassword: UpdatePasswordInput!): Boolean!
     updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
+    deleteProfile: Boolean!
   }
 
   input SignInput {

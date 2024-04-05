@@ -31,7 +31,6 @@ startStandaloneServer(server, {
             usersDataSource: new UsersDataSource(),
           },
           userIsLoggedIn: {
-            user_id: payload.user_id,
             user_email: payload.user_email,
           },
         }

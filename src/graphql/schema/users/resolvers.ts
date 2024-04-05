@@ -66,7 +66,22 @@ const updateProfile = async (
   return userDataUpdated
 }
 
+const deleteProfile = async (
+  _,
+  __,
+  { dataSources, userIsLoggedIn, res }: Context,
+) => {
+  res.setHeader('Set-Cookie', [
+    `authToken=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
+    `refresh_token=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
+  ])
+
+  return await dataSources.usersDataSource.deleteProfile(
+    userIsLoggedIn.user_email,
+  )
+}
+
 export const usersResolvers = {
   Query: { userByEmailExists },
-  Mutation: { sign, createUser, updatePassword, updateProfile },
+  Mutation: { sign, createUser, updatePassword, updateProfile, deleteProfile },
 }
