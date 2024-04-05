@@ -53,9 +53,9 @@ export class UsersDataSource
 
     userData.password = encryptedPassword
 
-    const token = createJWT({ username: userData.username })
+    const token = createJWT({ user_email: userData.email })
 
-    const refresh_token = createJWT({ username: userData.username })
+    const refresh_token = createJWT({ user_email: userData.email })
 
     return await this.db.users.create({
       data: { ...userData, token, refresh_token },
