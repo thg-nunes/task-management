@@ -116,30 +116,31 @@ export class UsersDataSource
 
     if (!passwordIsCorrect) throw new Error('Email ou senha incorreta.')
 
-    const user_jwt = jwt.sign(
-      { user_id: user.id, user_email: user.email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '15m', // expires in 15 minutes
-      },
-    )
+    if (!user.token && !user.refresh_token) {
+      const user_jwt = jwt.sign(
+        { user_id: user.id, user_email: user.email },
+        process.env.JWT_SECRET,
+      )
 
-    const user_refresh_token = jwt.sign(
-      { user_id: user.id, user_email: user.email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '2d', // expires in 2 days
-      },
-    )
+      const user_refresh_token = jwt.sign(
+        { user_id: user.id, user_email: user.email },
+        process.env.JWT_SECRET,
+      )
 
-    await this.db.users.update({
-      data: { token: user_jwt, refresh_token: user_refresh_token },
-      where: { email: user.email },
-    })
+      await this.db.users.update({
+        data: { token: user_jwt, refresh_token: user_refresh_token },
+        where: { email: user.email },
+      })
+
+      return {
+        token: user_jwt,
+        refresh_token: user_refresh_token,
+      }
+    }
 
     return {
-      token: user_jwt,
-      refresh_token: user_refresh_token,
+      token: user.token,
+      refresh_token: user.refresh_token,
     }
   }
 }
