@@ -13,6 +13,10 @@ import {
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
 export interface UsersDataSourceServices {
+  refreshToken(refresh_token: string): Promise<{
+    token: string
+    refresh_token: string
+  }>
   createUser({ userData }: CreateUserData): Promise<User>
   userByEmailExists(email: string): Promise<boolean>
   sign(signData: SignInput): Promise<SignResponse>
@@ -102,6 +106,8 @@ export class UsersDataSource
         email: true,
         username: true,
         password: true,
+        token: true,
+        refresh_token: true,
         created_at: true,
         updated_at: true,
       },
@@ -142,5 +148,31 @@ export class UsersDataSource
       token: user.token,
       refresh_token: user.refresh_token,
     }
+  }
+
+  async refreshToken(refresh_token: string): Promise<{
+    token: string
+    refresh_token: string
+  }> {
+    const payload = jwt.verify(refresh_token, process.env.JWT_SECRET) as {
+      user_id: string
+      user_email: string
+    }
+
+    const { user_id, user_email } = payload
+
+    const new_token = jwt.sign(
+      { user_id, user_email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '5s', // expires in 5 seconds
+      },
+    )
+
+    return await this.db.users.update({
+      data: { token: new_token },
+      where: { email: payload.user_email },
+      select: { token: true, refresh_token: true },
+    })
   }
 }
