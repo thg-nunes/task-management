@@ -13,27 +13,39 @@ const server = new ApolloServer({
 
 startStandaloneServer(server, {
   context: async ({ req, res }) => {
-    let tokenAndrRefreshToken: string[] = []
-
     if (req.headers.cookie) {
       const [refresh_token, auth_token] = req.headers.cookie.split('; ')
-      tokenAndrRefreshToken = [auth_token.split('=')[1]]
-    }
 
-    const payload = jwt.verify(
-      tokenAndrRefreshToken[0],
-      process.env.JWT_SECRET,
-      // { Desativar só quando tiver a lógica de refresh token no front-end, pq aí vai lançar um erro, e o client vai ser responsavel por criar a fila de req e atualizar o token em cada uma delas
-      //   ignoreExpiration: false,
-      // },
-    ) as UserIsLoggedIn
+      try {
+        const payload = jwt.verify(
+          auth_token.split('=')[1],
+          process.env.JWT_SECRET,
+          // { Desativar só quando tiver a lógica de refresh token no front-end, pq aí vai lançar um erro, e o client vai ser responsavel por criar a fila de req e atualizar o token em cada uma delas
+          //   ignoreExpiration: false,
+          // },
+        ) as UserIsLoggedIn
+
+        return {
+          res,
+          dataSources: {
+            usersDataSource: new UsersDataSource(),
+          },
+          userIsLoggedIn: {
+            user_id: payload.user_id,
+            user_email: payload.user_email,
+          },
+        }
+      } catch (error) {
+        res.setHeader('Set-Cookie', [
+          `authToken=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
+          `refresh_token=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
+        ])
+        throw new Error('Token inválido.')
+      }
+    }
 
     return {
       res,
-      userIsLoggedIn: {
-        user_id: payload.user_id,
-        user_email: payload.user_email,
-      },
       dataSources: {
         usersDataSource: new UsersDataSource(),
       },
