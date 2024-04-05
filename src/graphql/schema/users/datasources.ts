@@ -8,8 +8,10 @@ import {
   SignResponse,
   UpdatePasswordInput,
   User,
+  UserUpdateProfileInput,
 } from './types'
 import { createJWT } from '@utils/jwt'
+import { UserIsLoggedIn } from '@context/types'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
@@ -19,6 +21,10 @@ export interface UsersDataSourceServices {
     refresh_token: string
   }>
   createUser({ userData }: CreateUserData): Promise<User>
+  updateProfile(
+    { userUpdateProfile }: UserUpdateProfileInput,
+    { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
+  ): Promise<User>
   userByEmailExists(email: string): Promise<boolean>
   sign(signData: SignInput): Promise<SignResponse>
   updatePassword({ updatePassword }: UpdatePasswordInput): Promise<boolean>
@@ -171,6 +177,64 @@ export class UsersDataSource
       data: { token: new_token },
       where: { email: payload.user_email },
       select: { token: true, refresh_token: true },
+    })
+  }
+
+  async updateProfile(
+    { userUpdateProfile }: UserUpdateProfileInput,
+    { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
+  ): Promise<User> {
+    if (!Object.keys(userUpdateProfile).length)
+      throw new Error('Você deve enviar algum valor para atualizar.')
+
+    const fieldsToUpdate: string[] = []
+
+    for (const key in userUpdateProfile) {
+      if (
+        userUpdateProfile[key] !== undefined &&
+        userUpdateProfile[key] === ''
+      ) {
+        throw new Error(
+          `O campo "${key}" não pode ser nulo, envie um valor válido.`,
+        )
+      }
+
+      fieldsToUpdate.push(key)
+    }
+
+    if (fieldsToUpdate.includes('password')) {
+      userUpdateProfile.password = await passwordHash(
+        userUpdateProfile.password,
+      )
+    }
+
+    let updatedToken: string = ''
+
+    if (fieldsToUpdate.includes('email')) {
+      updatedToken = createJWT({
+        user_id: userIsLoggedIn.user_id,
+        user_email: userUpdateProfile.email,
+      })
+    }
+
+    if (updatedToken !== '') {
+      userUpdateProfile['token'] = updatedToken
+    }
+
+    userUpdateProfile['updated_at'] = new Date().toISOString()
+
+    return await this.db.users.update({
+      where: { email: userIsLoggedIn.user_email },
+      data: userUpdateProfile,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        token: true,
+        refresh_token: true,
+        created_at: true,
+        updated_at: true,
+      },
     })
   }
 }

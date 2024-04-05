@@ -3,7 +3,7 @@ import { UsersDataSourceServices } from '../schema/users/datasources'
 
 export type Context = {
   res: ServerResponse<IncomingMessage>
-  userIsLoggedIn: UserIsLoggedIn
+  userIsLoggedIn?: UserIsLoggedIn
   dataSources: {
     usersDataSource: UsersDataSourceServices
   }

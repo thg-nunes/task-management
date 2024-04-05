@@ -2,6 +2,8 @@ export type User = {
   id: string
   username: string
   email: string
+  token?: string
+  refresh_token?: string
   created_at: Date
   updated_at: Date
 }
@@ -19,6 +21,14 @@ export type UpdatePasswordInput = {
     email: string
     old_password: string
     new_password: string
+  }
+}
+
+export type UserUpdateProfileInput = {
+  userUpdateProfile: {
+    email: string
+    username: string
+    password: string
   }
 }
 

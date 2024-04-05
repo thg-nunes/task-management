@@ -48,7 +48,25 @@ const updatePassword = async (
   return await dataSources.usersDataSource.updatePassword({ updatePassword })
 }
 
+const updateProfile = async (
+  _,
+  { userUpdateProfile }: UserUpdateProfileInput,
+  { dataSources, userIsLoggedIn, res }: Context,
+) => {
+  const userDataUpdated = await dataSources.usersDataSource.updateProfile(
+    { userUpdateProfile },
+    { userIsLoggedIn },
+  )
+
+  res.setHeader('Set-Cookie', [
+    `authToken=${userDataUpdated.token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+    `refresh_token=${userDataUpdated.refresh_token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+  ])
+
+  return userDataUpdated
+}
+
 export const usersResolvers = {
   Query: { userByEmailExists },
-  Mutation: { sign, createUser, updatePassword },
+  Mutation: { sign, createUser, updatePassword, updateProfile },
 }
