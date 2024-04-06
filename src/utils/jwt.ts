@@ -10,15 +10,28 @@ export const createJWT = (
 }
 
 export const userIsAuthenticated = (cookie: string) => {
-  const [auth_token, refresh_token] = cookie.split('; ')
+  const tokens = cookie.split('; ')
+  let auth_token: string, refresh_token: string
 
-  const payload = jwt.verify(
-    auth_token.split('=')[1],
-    process.env.JWT_SECRET,
-    // { Desativar só quando tiver a lógica de refresh token no front-end, pq aí vai lançar um erro, e o client vai ser responsavel por criar a fila de req e atualizar o token em cada uma delas
-    //   ignoreExpiration: false,
-    // },
-  ) as UserIsLoggedIn
+  tokens.forEach((token) => {
+    if (token.startsWith('authToken=')) {
+      auth_token = token.split('=')[1]
+    } else if (token.startsWith('refresh_token=')) {
+      refresh_token = token.split('=')[1]
+    }
+  })
 
-  return payload
+  try {
+    const payload = jwt.verify(
+      auth_token,
+      process.env.JWT_SECRET,
+      // { Desativar só quando tiver a lógica de refresh token no front-end, pq aí vai lançar um erro, e o client vai ser responsavel por criar a fila de req e atualizar o token em cada uma delas
+      //   ignoreExpiration: false,
+      // },
+    ) as UserIsLoggedIn
+
+    return payload
+  } catch (error) {
+    return undefined
+  }
 }

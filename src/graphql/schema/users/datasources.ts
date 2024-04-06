@@ -80,11 +80,6 @@ export class UsersDataSource
       user_id: user.id,
     })
 
-    res.setHeader('Set-Cookie', [
-      `authToken=${token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
-      `refresh_token=${refresh_token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
-    ])
-
     await this.db.users.update({
       where: { id: user.id },
       data: { token, refresh_token },
