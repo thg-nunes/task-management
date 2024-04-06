@@ -35,3 +35,8 @@ export type SignResponse = {
   token: string
   refresh_token: string
 }
+
+export type UserIsLoggedIn = {
+  user_id: string
+  user_email: string
+}

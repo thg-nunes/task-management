@@ -6,6 +6,7 @@ import {
   UserUpdateProfileInput,
 } from './types'
 import { AppError } from '@utils/appError'
+import { userIsAuthenticated } from '@utils/jwt'
 
 // Query Resolvers
 
@@ -37,9 +38,10 @@ const createUser = async (
 const updateProfile = async (
   _,
   { userUpdateProfile }: UserUpdateProfileInput,
-  { dataSources, userIsLoggedIn, res }: Context,
+  { dataSources, req, res }: Context,
 ) => {
-  if (!userIsLoggedIn)
+  const _userIsAuthenticated = userIsAuthenticated(req.headers.cookie)
+  if (!_userIsAuthenticated)
     throw new AppError(
       'Você precisa fazer login para acessar esse recurso.',
       'FORBIDDEN',
@@ -47,7 +49,7 @@ const updateProfile = async (
 
   const userDataUpdated = await dataSources.usersDataSource.updateProfile(
     { userUpdateProfile },
-    { userIsLoggedIn },
+    { userIsLoggedIn: _userIsAuthenticated },
   )
 
   res.setHeader('Set-Cookie', [
@@ -58,12 +60,9 @@ const updateProfile = async (
   return userDataUpdated
 }
 
-const deleteProfile = async (
-  _,
-  __,
-  { dataSources, userIsLoggedIn, res }: Context,
-) => {
-  if (!userIsLoggedIn)
+const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
+  const _userIsAuthenticated = userIsAuthenticated(req.headers.cookie)
+  if (!_userIsAuthenticated)
     throw new AppError(
       'Você precisa fazer login para acessar esse recurso.',
       'FORBIDDEN',
@@ -75,7 +74,7 @@ const deleteProfile = async (
   ])
 
   return await dataSources.usersDataSource.deleteProfile(
-    userIsLoggedIn.user_email,
+    _userIsAuthenticated.user_email,
   )
 }
 

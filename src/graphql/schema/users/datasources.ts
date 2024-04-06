@@ -11,7 +11,7 @@ import {
   UserUpdateProfileInput,
 } from './types'
 import { createJWT } from '@utils/jwt'
-import { UserIsLoggedIn } from '@context/types'
+import { UserIsLoggedIn } from '@schema/users/types'
 import { AppError } from '@utils/appError'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
