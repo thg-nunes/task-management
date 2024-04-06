@@ -42,7 +42,7 @@ const updateProfile = async (
   if (!userIsLoggedIn)
     throw new AppError(
       'Você precisa fazer login para acessar esse recurso.',
-      'BAD_REQUEST',
+      'FORBIDDEN',
     )
 
   const userDataUpdated = await dataSources.usersDataSource.updateProfile(
@@ -66,7 +66,7 @@ const deleteProfile = async (
   if (!userIsLoggedIn)
     throw new AppError(
       'Você precisa fazer login para acessar esse recurso.',
-      'BAD_REQUEST',
+      'FORBIDDEN',
     )
 
   res.setHeader('Set-Cookie', [
@@ -82,5 +82,3 @@ const deleteProfile = async (
 export const usersResolvers = {
   Mutation: { sign, createUser, updateProfile, deleteProfile },
 }
-
-// CRIAR O MODEL E MUTATIONS DE TASKS: https://chat.openai.com/c/1c1f9023-211b-49da-898e-17187cec37ab
