@@ -2,6 +2,7 @@ export const projectsTypedefs = `#graphql
   extend type Mutation {
     createProject(projectData: CreateProjectInput!): Project!
     createProjectMember(project_id: String!): CreateProjectMemberResponse!
+    removeMemberOfProject(removeMemberOfProjectData: RemoveMemberOfProjectInpt): RemoveMemberOfProjectResponse!
   }
 
   type Project {
@@ -48,10 +49,15 @@ export const projectsTypedefs = `#graphql
   }
 
   union CreateProjectMemberResponse = CreateProjectMemberSuccessResponse | CreateProjectMemberErrorResponse
+
+  input RemoveMemberOfProjectInpt {
+    member_id: String!
+    project_id: String!
+  }
+
+  type RemoveMemberOfProjectResponse {
+    removed: Boolean!
+    member_id: String!
+  }
+
 `
-// [x] Mutation para criar um novo projeto.
-// [] Mutation para atualizar informações do projeto, como nome, descrição, prazos, etc.
-// [x] Mutation para adicionar membros à equipe de um projeto.
-// [] Mutation para remover membros da equipe de um projeto.
-// [] Mutation para excluir um projeto.
-// [] Mutation para ver todos os membros de um projeto.

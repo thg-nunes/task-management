@@ -42,3 +42,15 @@ export type CreateProjectMemberSuccessResponse = {
     user: Omit<User, 'token' | 'refresh_token'>
   }[]
 }
+
+export type RemoveMemberOfProjectInpt = {
+  removeMemberOfProjectData: {
+    member_id: string
+    project_id: string
+  }
+}
+
+export type RemoveMemberOfProjectResponse = {
+  removed: boolean
+  member_id: string
+}
