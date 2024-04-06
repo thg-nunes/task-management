@@ -5,6 +5,7 @@ import { startStandaloneServer } from '@apollo/server/standalone'
 import { resolvers, typeDefs } from '@schema/index'
 import { UsersDataSource } from '@schema/users/datasources'
 import { UserIsLoggedIn } from '@context/types'
+import { AppError } from '@utils/appError'
 
 const server = new ApolloServer({
   typeDefs,
@@ -39,7 +40,7 @@ startStandaloneServer(server, {
           `authToken=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
           `refresh_token=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
         ])
-        throw new Error('Token inválido.')
+        throw new AppError('Token inválido.', 'BAD_REQUEST')
       }
     }
 

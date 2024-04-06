@@ -12,6 +12,7 @@ import {
 } from './types'
 import { createJWT } from '@utils/jwt'
 import { UserIsLoggedIn } from '@context/types'
+import { AppError } from '@utils/appError'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
@@ -51,7 +52,10 @@ export class UsersDataSource
     })
 
     if (emailAlreadyExists) {
-      throw new Error(`O email "${userData.email}" já extá cadastrado.`)
+      throw new AppError(
+        `O email "${userData.email}" já extá cadastrado.`,
+        'BAD_REQUEST',
+      )
     }
 
     const encryptedPassword = await passwordHash(userData.password)
@@ -96,14 +100,15 @@ export class UsersDataSource
       },
     })
 
-    if (!user) throw new Error('Email ou senha incorreta.')
+    if (!user) throw new AppError('Email ou senha incorreta.', 'BAD_REQUEST')
 
     const passwordIsCorrect = await passwordCompareHash({
       password: signData.password,
       passwordHash: user.password,
     })
 
-    if (!passwordIsCorrect) throw new Error('Email ou senha incorreta.')
+    if (!passwordIsCorrect)
+      throw new AppError('Email ou senha incorreta.', 'BAD_REQUEST')
 
     return {
       token: user.token,
@@ -142,7 +147,10 @@ export class UsersDataSource
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
   ): Promise<User> {
     if (!Object.keys(userUpdateProfile).length)
-      throw new Error('Você deve enviar algum valor para atualizar.')
+      throw new AppError(
+        'Você deve enviar algum valor para atualizar.',
+        'BAD_USER_INPUT',
+      )
 
     const fieldsToUpdate: string[] = []
 
@@ -151,8 +159,9 @@ export class UsersDataSource
         userUpdateProfile[key] !== undefined &&
         userUpdateProfile[key] === ''
       ) {
-        throw new Error(
+        throw new AppError(
           `O campo "${key}" não pode ser nulo, envie um valor válido.`,
+          'BAD_USER_INPUT',
         )
       }
 
