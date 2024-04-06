@@ -1,5 +1,5 @@
 import { Context } from '@context/types'
-import { CreateProjectInput } from './types'
+import { CreateProjectInput, RemoveMemberOfProjectInpt } from './types'
 import { AppError } from '@utils/appError'
 
 export const createProject = async (
@@ -28,8 +28,21 @@ export const createProjectMember = async (
   })
 }
 
+export const removeMemberOfProject = async (
+  _,
+  { removeMemberOfProjectData }: RemoveMemberOfProjectInpt,
+  { dataSources, userIsLoggedIn }: Context,
+) => {
+  if (!userIsLoggedIn) throw new AppError('User_id é necessário.', 'FORBIDDEN')
+
+  return await dataSources.projectsDataSource.removeMemberOfProject({
+    removeMemberOfProjectData,
+    userLoggedId: userIsLoggedIn.user_id,
+  })
+}
+
 export const projectsResolvers = {
-  Mutation: { createProject, createProjectMember },
+  Mutation: { createProject, createProjectMember, removeMemberOfProject },
   CreateProjectMemberResponse: {
     __resolveType: (object) => {
       if (object.usersMembersList) return 'CreateProjectMemberSuccessResponse'

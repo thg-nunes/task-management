@@ -7,6 +7,8 @@ import {
   CreateProjectMemberErrorResponse,
   CreateProjectMemberSuccessResponse,
   Project,
+  RemoveMemberOfProjectInpt,
+  RemoveMemberOfProjectResponse,
 } from './types'
 
 export interface PostgresDataSourceMethods {
@@ -21,6 +23,11 @@ export interface PostgresDataSourceMethods {
   }): Promise<
     CreateProjectMemberSuccessResponse | CreateProjectMemberErrorResponse
   >
+  removeMemberOfProject(
+    data: RemoveMemberOfProjectInpt & {
+      userLoggedId: string
+    },
+  ): Promise<RemoveMemberOfProjectResponse>
 }
 
 export class ProjectsDataSource
@@ -127,5 +134,66 @@ export class ProjectsDataSource
     })
 
     return { usersMembersList: allMembersOfProject }
+  }
+
+  async removeMemberOfProject({
+    removeMemberOfProjectData,
+    userLoggedId,
+  }: RemoveMemberOfProjectInpt & {
+    userLoggedId: string
+  }): Promise<RemoveMemberOfProjectResponse> {
+    const requiredFields = ['member_id', 'project_id']
+
+    for (const key in removeMemberOfProjectData) {
+      if (
+        requiredFields.includes(key) &&
+        removeMemberOfProjectData[key] === ''
+      ) {
+        throw new AppError(`O campo ${key} não pode ser nulo.`)
+      }
+    }
+
+    // verificar se o projeto a ser deletado existe
+    const projectExists = await this.db.userMemberOfProjects.findFirst({
+      where: {
+        project_id: removeMemberOfProjectData.project_id,
+        user_id: removeMemberOfProjectData.member_id,
+      },
+      select: {
+        project: {
+          select: {
+            author_id: true,
+          },
+        },
+      },
+    })
+
+    if (!projectExists)
+      throw new AppError(
+        `O projeto "${removeMemberOfProjectData.project_id}" não existe.`,
+        'BAD_REQUEST',
+      )
+
+    // verificar se o usuario logado é dono do projeto
+    if (projectExists.project.author_id !== userLoggedId)
+      throw new AppError(
+        `Você não tem autorização para fazer isso.`,
+        'BAD_REQUEST',
+      )
+
+    // deletar membro
+    const memberDeleted = await this.db.userMemberOfProjects.delete({
+      where: {
+        user_id_project_id: {
+          user_id: removeMemberOfProjectData.member_id,
+          project_id: removeMemberOfProjectData.project_id,
+        },
+      },
+    })
+
+    return {
+      removed: !!memberDeleted.user_id,
+      member_id: memberDeleted.user_id,
+    }
   }
 }
