@@ -27,6 +27,15 @@ const sign = async (
   return { token, refresh_token }
 }
 
+const signOut = async (_, __, { res }: Context) => {
+  res.setHeader('Set-Cookie', [
+    `authToken=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict, Max-Age=0`,
+    `refresh_token=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict, Max-Age=0`,
+  ])
+
+  return true
+}
+
 const createUser = async (
   _,
   { userData }: CreateUserInput,
@@ -79,5 +88,5 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
 }
 
 export const usersResolvers = {
-  Mutation: { sign, createUser, updateProfile, deleteProfile },
+  Mutation: { sign, signOut, createUser, updateProfile, deleteProfile },
 }
