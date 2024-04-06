@@ -1,3 +1,5 @@
+import { User } from '@schema/users/types'
+
 export type Project = {
   id: string
   name: string
@@ -12,7 +14,7 @@ export type Project = {
   author_id: string
 }
 
-type ProjectMembers = {
+export type ProjectMembers = {
   user_id: string
   project_id: string
 }
@@ -28,4 +30,15 @@ export type CreateProjectInput = {
     status?: string
     category?: string
   }
+}
+
+export type CreateProjectMemberErrorResponse = {
+  message: string
+  project_id: string
+}
+
+export type CreateProjectMemberSuccessResponse = {
+  usersMembersList: {
+    user: Omit<User, 'token' | 'refresh_token'>
+  }[]
 }
