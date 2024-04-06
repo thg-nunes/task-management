@@ -2,9 +2,12 @@ import jwt from 'jsonwebtoken'
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 
+import { UserIsLoggedIn } from '@context/types'
+
 import { resolvers, typeDefs } from '@schema/index'
 import { UsersDataSource } from '@schema/users/datasources'
-import { UserIsLoggedIn } from '@context/types'
+import { ProjectsDataSource } from '@schema/projects/datasources'
+
 import { AppError } from '@utils/appError'
 
 const server = new ApolloServer({
@@ -30,6 +33,7 @@ startStandaloneServer(server, {
           res,
           dataSources: {
             usersDataSource: new UsersDataSource(),
+            projectsDataSource: new ProjectsDataSource(),
           },
           userIsLoggedIn: {
             user_email: payload.user_email,
@@ -48,6 +52,7 @@ startStandaloneServer(server, {
       res,
       dataSources: {
         usersDataSource: new UsersDataSource(),
+        projectsDataSource: new ProjectsDataSource(),
       },
     }
   },

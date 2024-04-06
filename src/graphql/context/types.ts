@@ -1,11 +1,13 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { UsersDataSourceServices } from '../schema/users/datasources'
+import { UsersDataSourceMethods } from '@schema/users/datasources'
+import { PostgresDataSourceMethods } from '@schema/projects/datasources'
 
 export type Context = {
   res: ServerResponse<IncomingMessage>
   userIsLoggedIn?: UserIsLoggedIn
   dataSources: {
-    usersDataSource: UsersDataSourceServices
+    usersDataSource: UsersDataSourceMethods
+    projectsDataSource: PostgresDataSourceMethods
   }
 }
 
