@@ -35,6 +35,8 @@ model Projects {
   members UserMemberOfProjects[]
   author Users @relation(fields: [author_id], references: [id])
   author_id String
+
+  @@unique([author_id, name])
 }
 
 model UserMemberOfProjects {
