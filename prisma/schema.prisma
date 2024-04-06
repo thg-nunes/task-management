@@ -16,4 +16,32 @@ model Users {
   refresh_token String?
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
+  projects_member UserMemberOfProjects[]
+  projects_author Projects[]
+}
+
+model Projects {
+  id String @id() @default(uuid())
+  name String
+  description String
+  start_date DateTime?
+  observations String?
+  started Boolean?
+  delivery_date DateTime?
+  status String?
+  category String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  members UserMemberOfProjects[]
+  author Users @relation(fields: [author_id], references: [id])
+  author_id String
+}
+
+model UserMemberOfProjects {
+  user Users @relation(fields: [user_id], references: [id])
+  user_id String
+  project Projects @relation(fields: [project_id], references: [id])
+  project_id String
+
+  @@id([user_id, project_id])
 }
