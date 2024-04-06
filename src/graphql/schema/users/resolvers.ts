@@ -5,6 +5,7 @@ import {
   SignResponse,
   UserUpdateProfileInput,
 } from './types'
+import { AppError } from '@utils/appError'
 
 // Query Resolvers
 
@@ -38,6 +39,12 @@ const updateProfile = async (
   { userUpdateProfile }: UserUpdateProfileInput,
   { dataSources, userIsLoggedIn, res }: Context,
 ) => {
+  if (!userIsLoggedIn)
+    throw new AppError(
+      'Você precisa fazer login para acessar esse recurso.',
+      'BAD_REQUEST',
+    )
+
   const userDataUpdated = await dataSources.usersDataSource.updateProfile(
     { userUpdateProfile },
     { userIsLoggedIn },
@@ -56,6 +63,12 @@ const deleteProfile = async (
   __,
   { dataSources, userIsLoggedIn, res }: Context,
 ) => {
+  if (!userIsLoggedIn)
+    throw new AppError(
+      'Você precisa fazer login para acessar esse recurso.',
+      'BAD_REQUEST',
+    )
+
   res.setHeader('Set-Cookie', [
     `authToken=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
     `refresh_token=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,
@@ -69,3 +82,5 @@ const deleteProfile = async (
 export const usersResolvers = {
   Mutation: { sign, createUser, updateProfile, deleteProfile },
 }
+
+// CRIAR O MODEL E MUTATIONS DE TASKS: https://chat.openai.com/c/1c1f9023-211b-49da-898e-17187cec37ab
