@@ -16,7 +16,7 @@ import { AppError } from '@utils/appError'
 
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
-export interface UsersDataSourceServices {
+export interface UsersDataSourceMethods {
   refreshToken(refresh_token: string): Promise<{
     token: string
     refresh_token: string
@@ -35,7 +35,7 @@ export interface UsersDataSourceServices {
 
 export class UsersDataSource
   extends PostgresDataSource
-  implements UsersDataSourceServices
+  implements UsersDataSourceMethods
 {
   constructor() {
     super()

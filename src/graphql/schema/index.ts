@@ -1,6 +1,7 @@
 import { usersTypeDefs } from './users/typeDefs'
 import { usersResolvers } from './users/resolvers'
 import { projectsTypedefs } from './projects/typeDefs'
+import { projectsResolvers } from './projects/resolvers'
 
 const rootTypeDefs = `#graphql
   type Query {
@@ -22,4 +23,4 @@ const rootResolvers = {
 }
 
 export const typeDefs = [rootTypeDefs, usersTypeDefs, projectsTypedefs]
-export const resolvers = [rootResolvers, usersResolvers]
+export const resolvers = [rootResolvers, usersResolvers, projectsResolvers]
