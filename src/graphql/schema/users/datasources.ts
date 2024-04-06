@@ -29,9 +29,7 @@ export interface UsersDataSourceServices {
     { userUpdateProfile }: UserUpdateProfileInput,
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
   ): Promise<User>
-  userByEmailExists(email: string): Promise<boolean>
   sign(signData: SignInput): Promise<SignResponse>
-  updatePassword({ updatePassword }: UpdatePasswordInput): Promise<boolean>
 }
 
 export class UsersDataSource
@@ -84,14 +82,6 @@ export class UsersDataSource
   async deleteProfile(email: string) {
     const userDeleted = await this.db.users.delete({ where: { email } })
     return !!userDeleted.id
-  }
-
-  async userByEmailExists(email: string): Promise<boolean> {
-    const user = await this.db.users.findFirst({ where: { email } })
-
-    if (!user) throw new Error('Usuário informado não existe.')
-
-    return !!user.email
   }
 
   async sign({ signData }: SignInput): Promise<SignResponse> {

@@ -1,8 +1,4 @@
 export const usersTypeDefs = `#graphql
-  extend type Query {
-    userByEmailExists(email: String!): Boolean!
-  }
-
   extend type Mutation {
     sign(signData: SignInput!): SignResponse!
     createUser(userData: CreateUserInput!): User!

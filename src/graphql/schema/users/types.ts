@@ -16,14 +16,6 @@ export type CreateUserInput = {
   }
 }
 
-export type UpdatePasswordInput = {
-  updatePassword: {
-    email: string
-    old_password: string
-    new_password: string
-  }
-}
-
 export type UserUpdateProfileInput = {
   userUpdateProfile: {
     email: string

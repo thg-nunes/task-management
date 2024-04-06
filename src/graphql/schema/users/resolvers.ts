@@ -7,13 +7,6 @@ import {
 } from './types'
 
 // Query Resolvers
-const userByEmailExists = async (
-  _,
-  { email }: { email: string },
-  { dataSources }: Context,
-) => {
-  return await dataSources.usersDataSource.userByEmailExists(email)
-}
 
 // Mutations Resolvers
 const sign = async (
@@ -74,6 +67,5 @@ const deleteProfile = async (
 }
 
 export const usersResolvers = {
-  Query: { userByEmailExists },
   Mutation: { sign, createUser, updateProfile, deleteProfile },
 }
