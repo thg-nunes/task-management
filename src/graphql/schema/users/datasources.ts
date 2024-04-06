@@ -53,7 +53,7 @@ export class UsersDataSource
 
     if (emailAlreadyExists) {
       throw new AppError(
-        `O email "${userData.email}" já extá cadastrado.`,
+        `O email "${userData.email}" já está cadastrado.`,
         'BAD_REQUEST',
       )
     }

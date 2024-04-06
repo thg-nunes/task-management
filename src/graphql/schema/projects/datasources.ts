@@ -1,12 +1,26 @@
 import { PostgresDataSource } from '@dataSources/postgres'
-import { CreateProjectInput, Project } from './types'
+
 import { AppError } from '@utils/appError'
+
+import {
+  CreateProjectInput,
+  CreateProjectMemberErrorResponse,
+  CreateProjectMemberSuccessResponse,
+  Project,
+} from './types'
 
 export interface PostgresDataSourceMethods {
   createProject(
     { projectData }: CreateProjectInput,
     user_id: string,
   ): Promise<Project>
+
+  createProjectMember(data: {
+    project_id: string
+    user_id: string
+  }): Promise<
+    CreateProjectMemberSuccessResponse | CreateProjectMemberErrorResponse
+  >
 }
 
 export class ProjectsDataSource
@@ -68,5 +82,50 @@ export class ProjectsDataSource
         author_id: true,
       },
     })
+  }
+
+  async createProjectMember({
+    user_id,
+    project_id,
+  }: {
+    user_id: string
+    project_id: string
+  }): Promise<
+    CreateProjectMemberErrorResponse | CreateProjectMemberSuccessResponse
+  > {
+    const userAlreadyMemberOfProject =
+      await this.db.userMemberOfProjects.findFirst({
+        where: { project_id, user_id },
+      })
+
+    if (userAlreadyMemberOfProject)
+      return {
+        project_id,
+        message: 'Você já é membro desse projeto',
+      }
+
+    await this.db.userMemberOfProjects.create({
+      data: {
+        user_id,
+        project_id,
+      },
+    })
+
+    const allMembersOfProject = await this.db.userMemberOfProjects.findMany({
+      where: { project_id },
+      select: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            created_at: true,
+            updated_at: true,
+          },
+        },
+      },
+    })
+
+    return { usersMembersList: allMembersOfProject }
   }
 }
