@@ -62,17 +62,8 @@ export class UsersDataSource
 
     userData.password = encryptedPassword
 
-    const token = createJWT({ user_email: userData.email })
-
-    const refresh_token = createJWT({ user_email: userData.email })
-
-    res.setHeader('Set-Cookie', [
-      `authToken=${token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
-      `refresh_token=${refresh_token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
-    ])
-
-    return await this.db.users.create({
-      data: { ...userData, token, refresh_token },
+    const user = await this.db.users.create({
+      data: { ...userData },
       select: {
         id: true,
         email: true,
@@ -81,6 +72,25 @@ export class UsersDataSource
         updated_at: true,
       },
     })
+
+    const token = createJWT({ user_email: userData.email, user_id: user.id })
+
+    const refresh_token = createJWT({
+      user_email: userData.email,
+      user_id: user.id,
+    })
+
+    res.setHeader('Set-Cookie', [
+      `authToken=${token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+      `refresh_token=${refresh_token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+    ])
+
+    await this.db.users.update({
+      where: { id: user.id },
+      data: { token, refresh_token },
+    })
+
+    return user
   }
 
   async deleteProfile(email: string) {
