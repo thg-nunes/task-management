@@ -12,5 +12,6 @@ export type Context = {
 }
 
 export type UserIsLoggedIn = {
+  user_id: string
   user_email: string
 }

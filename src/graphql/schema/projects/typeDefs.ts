@@ -24,7 +24,6 @@ export const projectsTypedefs = `#graphql
 
   input CreateProjectInput {
     name: String!
-    author_id: String!
     description: String!
     start_date: String
     observations: String

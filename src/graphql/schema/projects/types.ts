@@ -2,12 +2,13 @@ export type Project = {
   id: string
   name: string
   description: string
-  start_date: Date
-  observations: string
-  started: boolean
-  delivery_date: Date
-  status: string
-  category: string
+  start_date: Date | null
+  observations: string | null
+  started: boolean | null
+  delivery_date: Date | null
+  status: string | null
+  members: ProjectMembers[]
+  category: string | null
   author_id: string
 }
 
@@ -19,7 +20,6 @@ type ProjectMembers = {
 export type CreateProjectInput = {
   projectData: {
     name: string
-    author_id: string
     description: string
     start_date?: Date
     observations?: string
