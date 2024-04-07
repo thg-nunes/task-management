@@ -25,7 +25,7 @@ export const projectsTypedefs = `#graphql
     started: Boolean
     delivery_date: String
     status: String
-    category: String
+    category: [String!]
     created_at: String
     updated_at: String
     members: [ProjectMembers]
@@ -51,8 +51,8 @@ export const projectsTypedefs = `#graphql
     observations: String
     started: Boolean
     delivery_date: String
-    status: CreateProjectStatus!
-    category: String
+    status: CreateProjectStatus
+    category: [String!]
   }
 
   input CreateProjectInput {
@@ -62,8 +62,8 @@ export const projectsTypedefs = `#graphql
     observations: String
     started: Boolean
     delivery_date: String
-    status: String
-    category: String
+    status: CreateProjectStatus
+    category: [String!]
   }
 
   type CreateProjectMemberErrorResponse {

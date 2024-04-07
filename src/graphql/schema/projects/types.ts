@@ -12,7 +12,7 @@ export type Project = {
   delivery_date: Date | null
   status: string | null
   members: ProjectMembers[]
-  category: string | null
+  category: Array<string> | []
   author_id: string
 }
 
@@ -25,12 +25,12 @@ export type CreateProjectInput = {
   projectData: {
     name: string
     description: string
-    start_date?: Date
-    observations?: string
-    started?: boolean
-    delivery_date?: Date
-    status?: string
-    category?: string
+    start_date?: Date | null
+    observations?: string | null
+    started?: boolean | null
+    delivery_date?: Date | null
+    status?: string | null
+    category?: Array<string> | null
   }
 }
 
@@ -78,6 +78,6 @@ export type UpdateProjectDataInput = {
     started?: boolean
     delivery_date?: Date
     status?: CreateProjectStatus
-    category?: string
+    category?: Array<string>
   }
 }

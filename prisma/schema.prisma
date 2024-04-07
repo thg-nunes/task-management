@@ -29,7 +29,7 @@ model Projects {
   started Boolean?
   delivery_date DateTime?
   status String?
-  category String?
+  category String[]
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
   members UserMemberOfProjects[]
