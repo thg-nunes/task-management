@@ -1,8 +1,9 @@
 // [x] Mutation para criar um novo projeto.
 // [] Mutation para atualizar informações do projeto, como nome, descrição, prazos, etc.
+// [x] Criar o cascade na deleção de um user para deletar tudo que estiver referenciando esse user ( Projects & UserMemberOfProjects )
 // [x] Mutation para adicionar membros à equipe de um projeto.
 // [x] Mutation para remover membros da equipe de um projeto.
-// [] Mutation para excluir um projeto.
+// [x] Mutation para excluir um projeto.
 // [x] Query para ver todos os membros de um projeto.
 
 export const projectsTypedefs = `#graphql
@@ -18,7 +19,7 @@ export const projectsTypedefs = `#graphql
   extend type Mutation {
     createProject(projectData: CreateProjectInput!): Project!
     deleteProject(project_id: String!): DeleteProjectResponse
-    createProjectMember(project_id: String!): CreateProjectMemberResponse!
+    updateProject(updateProjectData: UpdateProjectDataInput!): Project!    createProjectMember(project_id: String!): CreateProjectMemberResponse!
     removeMemberOfProject(removeMemberOfProjectData: RemoveMemberOfProjectInpt): RemoveMemberOfProjectResponse!
   }
 
@@ -32,6 +33,8 @@ export const projectsTypedefs = `#graphql
     delivery_date: String
     status: String
     category: String
+    created_at: String
+    updated_at: String
     members: [ProjectMembers]
     author_id: String!
   }
@@ -39,6 +42,24 @@ export const projectsTypedefs = `#graphql
   type ProjectMembers {
     user_id: String!
     project_id: String!
+  }
+  
+  enum CreateProjectStatus {
+    CONCLUIDO
+    EM_PROGRESSO
+    FINALIZADO
+  }
+
+  input UpdateProjectDataInput {
+    id: String!
+    name: String
+    description: String
+    start_date: String
+    observations: String
+    started: Boolean
+    delivery_date: String
+    status: CreateProjectStatus!
+    category: String
   }
 
   input CreateProjectInput {

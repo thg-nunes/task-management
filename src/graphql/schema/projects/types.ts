@@ -5,6 +5,8 @@ export type Project = {
   name: string
   description: string
   start_date: Date | null
+  created_at: Date | null
+  updated_at: Date | null
   observations: string | null
   started: boolean | null
   delivery_date: Date | null
@@ -32,6 +34,12 @@ export type CreateProjectInput = {
   }
 }
 
+enum CreateProjectStatus {
+  CONCLUIDO = 'CONCLUIDO',
+  EM_PROGRESSO = 'EM_PROGRESSO',
+  FINALIZADO = 'FINALIZADO',
+}
+
 export type CreateProjectMemberErrorResponse = {
   message: string
   project_id: string
@@ -57,5 +65,19 @@ export type RemoveMemberOfProjectResponse = {
 
 export type DeleteProjectResponse = {
   status: 'SUCCESS' | 'ERROR'
-  project_id: String
+  project_id: string
+}
+
+export type UpdateProjectDataInput = {
+  updateProjectData: {
+    id: string
+    name?: string
+    description?: string
+    start_date?: Date
+    observations?: string
+    started?: boolean
+    delivery_date?: Date
+    status?: CreateProjectStatus
+    category?: string
+  }
 }
