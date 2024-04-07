@@ -34,6 +34,20 @@ export const createProject = async (
   )
 }
 
+export const deleteProject = async (
+  _,
+  { project_id }: { project_id: string },
+  { req, dataSources }: Context,
+) => {
+  const userIsLoggedIn = await userIsAuthenticated(req.headers.cookie)
+  if (!userIsLoggedIn) throw new AppError('User_id é necessário.', 'FORBIDDEN')
+
+  return await dataSources.projectsDataSource.deleteProject({
+    project_id,
+    user_id: userIsLoggedIn.user_id,
+  })
+}
+
 export const createProjectMember = async (
   _,
   { project_id }: { project_id: string },
@@ -66,7 +80,12 @@ export const removeMemberOfProject = async (
 
 export const projectsResolvers = {
   Query: { viewAllMembersOfProject },
-  Mutation: { createProject, createProjectMember, removeMemberOfProject },
+  Mutation: {
+    createProject,
+    createProjectMember,
+    removeMemberOfProject,
+    deleteProject,
+  },
   CreateProjectMemberResponse: {
     __resolveType: (object) => {
       if (object.usersMembersList) return 'CreateProjectMemberSuccessResponse'

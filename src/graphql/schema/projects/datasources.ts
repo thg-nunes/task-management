@@ -14,6 +14,11 @@ export interface PostgresDataSourceMethods {
     user_id: string,
   ): Promise<ProjectTypes.Project>
 
+  deleteProject(data: {
+    project_id: string
+    user_id: string
+  }): Promise<ProjectTypes.DeleteProjectResponse>
+
   createProjectMember(data: {
     project_id: string
     user_id: string
@@ -107,6 +112,36 @@ export class ProjectsDataSource
         author_id: true,
       },
     })
+  }
+
+  async deleteProject({
+    user_id,
+    project_id,
+  }: {
+    project_id: string
+    user_id: string
+  }): Promise<ProjectTypes.DeleteProjectResponse> {
+    const projectExists = await this.db.projects.findUnique({
+      where: { id: project_id },
+      select: {
+        author_id: true,
+      },
+    })
+
+    if (!projectExists)
+      throw new Error(`Projeto "${project_id}" não encontrado`)
+
+    if (user_id !== projectExists.author_id)
+      throw new AppError(`Você não pode realizar essa operação.`, 'BAD_REQUEST')
+
+    const projectDeleted = await this.db.projects.delete({
+      where: { id: project_id },
+    })
+
+    if (projectDeleted)
+      return { project_id: projectDeleted.id, status: 'SUCCESS' }
+
+    return { project_id: projectDeleted.id, status: 'ERROR' }
   }
 
   async createProjectMember({
