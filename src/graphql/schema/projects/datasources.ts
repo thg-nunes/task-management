@@ -2,32 +2,30 @@ import { PostgresDataSource } from '@dataSources/postgres'
 
 import { AppError } from '@utils/appError'
 
-import {
-  CreateProjectInput,
-  CreateProjectMemberErrorResponse,
-  CreateProjectMemberSuccessResponse,
-  Project,
-  RemoveMemberOfProjectInpt,
-  RemoveMemberOfProjectResponse,
-} from './types'
+import * as ProjectTypes from './types'
+import { User } from '@schema/users/types'
 
 export interface PostgresDataSourceMethods {
+  viewAllMembersOfProject(project_id: string): Promise<{
+    members: { user: User }[]
+  }>
   createProject(
-    { projectData }: CreateProjectInput,
+    { projectData }: ProjectTypes.CreateProjectInput,
     user_id: string,
-  ): Promise<Project>
+  ): Promise<ProjectTypes.Project>
 
   createProjectMember(data: {
     project_id: string
     user_id: string
   }): Promise<
-    CreateProjectMemberSuccessResponse | CreateProjectMemberErrorResponse
+    | ProjectTypes.CreateProjectMemberSuccessResponse
+    | ProjectTypes.CreateProjectMemberErrorResponse
   >
   removeMemberOfProject(
-    data: RemoveMemberOfProjectInpt & {
+    data: ProjectTypes.RemoveMemberOfProjectInpt & {
       userLoggedId: string
     },
-  ): Promise<RemoveMemberOfProjectResponse>
+  ): Promise<ProjectTypes.RemoveMemberOfProjectResponse>
 }
 
 export class ProjectsDataSource
@@ -38,10 +36,30 @@ export class ProjectsDataSource
     super()
   }
 
+  async viewAllMembersOfProject(project_id: string): Promise<{
+    members: { user: User }[]
+  }> {
+    const projecteExists = await this.db.projects.findUnique({
+      where: { id: project_id },
+      select: {
+        members: {
+          select: {
+            user: true,
+          },
+        },
+      },
+    })
+
+    if (!projecteExists)
+      throw new AppError(`Projeto "${project_id}" não existe.`)
+
+    return projecteExists
+  }
+
   async createProject(
-    { projectData }: CreateProjectInput,
+    { projectData }: ProjectTypes.CreateProjectInput,
     user_id: string,
-  ): Promise<Project> {
+  ): Promise<ProjectTypes.Project> {
     if (!Object.keys(projectData).length)
       throw new AppError('Você não pode criar um projeto vazio.')
 
@@ -98,7 +116,8 @@ export class ProjectsDataSource
     user_id: string
     project_id: string
   }): Promise<
-    CreateProjectMemberErrorResponse | CreateProjectMemberSuccessResponse
+    | ProjectTypes.CreateProjectMemberErrorResponse
+    | ProjectTypes.CreateProjectMemberSuccessResponse
   > {
     const userAlreadyMemberOfProject =
       await this.db.userMemberOfProjects.findFirst({
@@ -139,9 +158,9 @@ export class ProjectsDataSource
   async removeMemberOfProject({
     removeMemberOfProjectData,
     userLoggedId,
-  }: RemoveMemberOfProjectInpt & {
+  }: ProjectTypes.RemoveMemberOfProjectInpt & {
     userLoggedId: string
-  }): Promise<RemoveMemberOfProjectResponse> {
+  }): Promise<ProjectTypes.RemoveMemberOfProjectResponse> {
     const requiredFields = ['member_id', 'project_id']
 
     for (const key in removeMemberOfProjectData) {

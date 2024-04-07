@@ -1,7 +1,24 @@
 import { Context } from '@context/types'
 import { CreateProjectInput, RemoveMemberOfProjectInpt } from './types'
 import { AppError } from '@utils/appError'
+import { userIsAuthenticated } from '@utils/jwt'
 
+// Query Resolvers
+const viewAllMembersOfProject = async (
+  _,
+  { project_id }: { project_id: string },
+  { dataSources, req }: Context,
+) => {
+  const _userIsAuthenticated = userIsAuthenticated(req.headers.cookie)
+  if (!_userIsAuthenticated)
+    throw new AppError('User_id é necessário.', 'FORBIDDEN')
+
+  return await dataSources.projectsDataSource.viewAllMembersOfProject(
+    project_id,
+  )
+}
+
+// Mutation Resolvers
 export const createProject = async (
   _,
   { projectData }: CreateProjectInput,
@@ -48,6 +65,7 @@ export const removeMemberOfProject = async (
 }
 
 export const projectsResolvers = {
+  Query: { viewAllMembersOfProject },
   Mutation: { createProject, createProjectMember, removeMemberOfProject },
   CreateProjectMemberResponse: {
     __resolveType: (object) => {
