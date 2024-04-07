@@ -33,14 +33,14 @@ model Projects {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
   members UserMemberOfProjects[]
-  author Users @relation(fields: [author_id], references: [id])
+  author Users @relation(fields: [author_id], references: [id], onDelete: Cascade)
   author_id String
 
   @@unique([author_id, name])
 }
 
 model UserMemberOfProjects {
-  user Users @relation(fields: [user_id], references: [id])
+  user Users @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id String
   project Projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String
