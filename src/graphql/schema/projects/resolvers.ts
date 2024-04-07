@@ -73,6 +73,19 @@ export const removeMemberOfProject = async (
   })
 }
 
+export const updateProject = async (
+  _,
+  { updateProjectData }: UpdateProjectDataInput,
+  { dataSources, req }: Context,
+): Promise<Project> => {
+  const { user_id } = userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.projectsDataSource.updateProject({
+    updateProjectData,
+    user_id,
+  })
+}
+
 export const projectsResolvers = {
   Query: { viewAllMembersOfProject },
   Mutation: {
@@ -80,6 +93,7 @@ export const projectsResolvers = {
     createProjectMember,
     removeMemberOfProject,
     deleteProject,
+    updateProject,
   },
   CreateProjectMemberResponse: {
     __resolveType: (object) => {

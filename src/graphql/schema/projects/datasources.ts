@@ -14,6 +14,10 @@ export interface PostgresDataSourceMethods {
     user_id: string,
   ): Promise<ProjectTypes.Project>
 
+  updateProject(
+    data: ProjectTypes.UpdateProjectDataInput & { user_id: string },
+  ): Promise<ProjectTypes.Project>
+
   deleteProject(data: {
     project_id: string
     user_id: string
@@ -39,6 +43,88 @@ export class ProjectsDataSource
 {
   constructor() {
     super()
+  }
+
+  async updateProject({
+    updateProjectData,
+    user_id,
+  }: ProjectTypes.UpdateProjectDataInput & {
+    user_id: string
+  }): Promise<ProjectTypes.Project> {
+    const projectToUpdate = await this.db.projects.findUnique({
+      where: { id: updateProjectData.id },
+      select: {
+        author_id: true,
+      },
+    })
+
+    if (!projectToUpdate)
+      throw new AppError(
+        `Projeto de id "${updateProjectData.id}" não encontrado.`,
+        'BAD_REQUEST',
+      )
+
+    if (user_id !== projectToUpdate.author_id)
+      throw new AppError(
+        `Você não tem autorização para atualizar esse projeto`,
+        'BAD_REQUEST',
+      )
+
+    const requiredFields = ['name', 'description']
+
+    for (const requiredField of requiredFields) {
+      if (
+        !updateProjectData[requiredField] ||
+        updateProjectData[requiredField] === ''
+      )
+        throw new AppError(
+          `O campo "${requiredField}" é obrigatório e não pode ser nulo.`,
+        )
+    }
+
+    const currentDate = new Date()
+
+    if (updateProjectData.start_date) {
+      const sentDate = new Date(updateProjectData.start_date)
+
+      if (sentDate > currentDate) {
+        updateProjectData.started = false
+      }
+
+      if (sentDate <= currentDate) {
+        updateProjectData.started = true
+      }
+    }
+
+    return await this.db.projects.update({
+      where: { id: updateProjectData.id },
+      data: {
+        name: updateProjectData.name,
+        description: updateProjectData.description,
+        start_date: updateProjectData.start_date,
+        observations: updateProjectData.observations,
+        started: updateProjectData.started,
+        delivery_date: updateProjectData.delivery_date,
+        status: updateProjectData.status,
+        category: updateProjectData.category,
+        updated_at: currentDate,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        start_date: true,
+        observations: true,
+        started: true,
+        delivery_date: true,
+        status: true,
+        category: true,
+        created_at: true,
+        updated_at: true,
+        members: true,
+        author_id: true,
+      },
+    })
   }
 
   async viewAllMembersOfProject(project_id: string): Promise<{
@@ -74,6 +160,22 @@ export class ProjectsDataSource
         throw new AppError(`O campo ${key} é obrigatório e Não pode ser nulo.`)
       }
     }
+
+    const currentDate = new Date()
+
+    if (projectData.start_date) {
+      const sentDate = new Date(projectData.start_date)
+
+      if (sentDate > currentDate) {
+        projectData.started = false
+      }
+
+      if (sentDate <= currentDate) {
+        projectData.started = true
+      }
+    }
+
+    projectData.started = false
 
     const projectNameAlreadyExists = await this.db.projects.findUnique({
       where: {
