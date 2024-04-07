@@ -9,7 +9,7 @@ export const createJWT = (
   return jwt.sign(payload, process.env.JWT_SECRET, options)
 }
 
-export const userIsAuthenticated = (cookie: string) => {
+export const userIsAuthenticated = (cookie: string = '') => {
   const tokens = cookie.split('; ')
   let auth_token: string, refresh_token: string
 

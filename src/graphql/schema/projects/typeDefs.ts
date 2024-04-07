@@ -1,4 +1,20 @@
+// [x] Mutation para criar um novo projeto.
+// [] Mutation para atualizar informações do projeto, como nome, descrição, prazos, etc.
+// [x] Mutation para adicionar membros à equipe de um projeto.
+// [x] Mutation para remover membros da equipe de um projeto.
+// [] Mutation para excluir um projeto.
+// [] Query para ver todos os membros de um projeto.
+
 export const projectsTypedefs = `#graphql
+  extend type Query {
+    viewAllMembersOfProject(project_id: String!): ViewAllMembersOfProjectResponse
+  }
+
+  type ViewAllMembersOfProjectResponse {
+    members: [ProjectMembersList!]!
+  }
+
+
   extend type Mutation {
     createProject(projectData: CreateProjectInput!): Project!
     createProjectMember(project_id: String!): CreateProjectMemberResponse!
