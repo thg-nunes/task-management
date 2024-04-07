@@ -42,7 +42,7 @@ model Projects {
 model UserMemberOfProjects {
   user Users @relation(fields: [user_id], references: [id])
   user_id String
-  project Projects @relation(fields: [project_id], references: [id])
+  project Projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id String
 
   @@id([user_id, project_id])
