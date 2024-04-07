@@ -54,3 +54,8 @@ export type RemoveMemberOfProjectResponse = {
   removed: boolean
   member_id: string
 }
+
+export type DeleteProjectResponse = {
+  status: 'SUCCESS' | 'ERROR'
+  project_id: String
+}
