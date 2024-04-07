@@ -50,11 +50,6 @@ const updateProfile = async (
   { dataSources, req, res }: Context,
 ) => {
   const _userIsAuthenticated = userIsAuthenticated(req.headers.cookie)
-  if (!_userIsAuthenticated)
-    throw new AppError(
-      'Você precisa fazer login para acessar esse recurso.',
-      'FORBIDDEN',
-    )
 
   const userDataUpdated = await dataSources.usersDataSource.updateProfile(
     { userUpdateProfile },
@@ -71,11 +66,6 @@ const updateProfile = async (
 
 const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
   const _userIsAuthenticated = userIsAuthenticated(req.headers.cookie)
-  if (!_userIsAuthenticated)
-    throw new AppError(
-      'Você precisa fazer login para acessar esse recurso.',
-      'FORBIDDEN',
-    )
 
   res.setHeader('Set-Cookie', [
     `authToken=''; Domain=localhost; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`,

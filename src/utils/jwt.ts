@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 import { UserIsLoggedIn } from '@schema/users/types'
+import { AppError } from './appError'
 
 export const createJWT = (
   payload: string | object | Buffer,
@@ -32,6 +33,6 @@ export const userIsAuthenticated = (cookie: string = '') => {
 
     return payload
   } catch (error) {
-    return undefined
+    throw new AppError('User_id é necessário.', 'FORBIDDEN')
   }
 }
