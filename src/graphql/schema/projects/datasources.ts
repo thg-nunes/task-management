@@ -61,7 +61,7 @@ export class ProjectsDataSource
     if (!projectToUpdate)
       throw new AppError(
         `Projeto de id "${updateProjectData.id}" não encontrado.`,
-        'BAD_REQUEST',
+        'NOT_FOUND',
       )
 
     if (user_id !== projectToUpdate.author_id)
@@ -79,6 +79,7 @@ export class ProjectsDataSource
       )
         throw new AppError(
           `O campo "${requiredField}" é obrigatório e não pode ser nulo.`,
+          'BAD_USER_INPUT',
         )
     }
 
@@ -142,7 +143,7 @@ export class ProjectsDataSource
     })
 
     if (!projecteExists)
-      throw new AppError(`Projeto "${project_id}" não existe.`)
+      throw new AppError(`Projeto "${project_id}" não existe.`, 'NOT_FOUND')
 
     return projecteExists
   }
@@ -187,7 +188,10 @@ export class ProjectsDataSource
     })
 
     if (projectNameAlreadyExists)
-      throw new AppError(`Um projeto com o mesmo nome já foi criado.`)
+      throw new AppError(
+        `Um projeto com o mesmo nome já foi criado.`,
+        'BAD_REQUEST',
+      )
 
     return await this.db.projects.create({
       data: {
@@ -327,7 +331,7 @@ export class ProjectsDataSource
     if (!projectExists)
       throw new AppError(
         `O projeto "${removeMemberOfProjectData.project_id}" não existe.`,
-        'BAD_REQUEST',
+        'NOT_FOUND',
       )
 
     // verificar se o usuario logado é dono do projeto

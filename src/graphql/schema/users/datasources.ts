@@ -105,7 +105,7 @@ export class UsersDataSource
       },
     })
 
-    if (!user) throw new AppError('Email ou senha incorreta.', 'BAD_REQUEST')
+    if (!user) throw new AppError('Email ou senha incorreta.', 'NOT_FOUND')
 
     const passwordIsCorrect = await passwordCompareHash({
       password: signData.password,
@@ -113,7 +113,7 @@ export class UsersDataSource
     })
 
     if (!passwordIsCorrect)
-      throw new AppError('Email ou senha incorreta.', 'BAD_REQUEST')
+      throw new AppError('Email ou senha incorreta.', 'NOT_FOUND')
 
     return {
       token: user.token,
