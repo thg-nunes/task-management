@@ -18,6 +18,8 @@ model Users {
   updated_at DateTime @default(now())
   projects_member UserMemberOfProjects[]
   projects_author Projects[]
+  comments_creted Comments[]
+  tasks Tasks[]
 }
 
 model Projects {
@@ -35,6 +37,7 @@ model Projects {
   members UserMemberOfProjects[]
   author Users @relation(fields: [author_id], references: [id], onDelete: Cascade)
   author_id String
+  tasks Tasks[]
 
   @@unique([author_id, name])
 }
@@ -46,4 +49,36 @@ model UserMemberOfProjects {
   project_id String
 
   @@id([user_id, project_id])
+}
+
+model Tasks {
+  id String @id @default(cuid())
+  title String
+  description String
+  status String
+  priority String
+  due_date DateTime
+  comments Comments[]
+  project Projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  project_id String
+  assigned_to Users @relation(fields: [assigned_to_id], references: [id], onDelete: Cascade)
+  assigned_to_id String
+  created_by_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  
+  @@unique([project_id, title, description])
+}
+
+model Comments {
+  id String @id @default(cuid())
+  comment String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  createdBy Users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id String
+  task Tasks @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  task_id String
+
+  @@unique([task_id, user_id])
 }
