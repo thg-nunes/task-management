@@ -4,6 +4,7 @@ export const tasksTypeDefs = `#graphql
     createTaskToProject(createTaskToProjectData: CreateTaskToProjectInput!): Task!
     updateTaskOfProject(updateTaskInput: UpdateTaskInput!): UpdateTaskOfProjectResponse!
     deleteTaskOfProject(task_id: String!): Boolean!
+    updateTaskAssignedToUser(updateTaskAssignedToUserInput: UpdateTaskAssignedToUserInput!): Task!
   }
 
   enum TaskStatus {
@@ -84,4 +85,8 @@ export const tasksTypeDefs = `#graphql
     created_by_id: String!
   }
 
+  input UpdateTaskAssignedToUserInput {
+    task_id: String!
+    assigned_to_id: String!
+  }
 `
