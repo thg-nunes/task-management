@@ -41,7 +41,6 @@ export type Comment = {
   task_id: string
 }
 
-// essa aqui é pra commitar depois da createTask toda testada e commitada
 export type UpdateTaskInput = {
   updateTaskInput: {
     task_id: string

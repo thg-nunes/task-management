@@ -2,6 +2,7 @@ export const tasksTypeDefs = `#graphql
 
   extend type Mutation {
     createTaskToProject(createTaskToProjectData: CreateTaskToProjectInput!): Task!
+    updateTaskOfProject(updateTaskInput: UpdateTaskInput!): UpdateTaskOfProjectResponse!
   }
 
   enum TaskStatus {
@@ -56,4 +57,30 @@ export const tasksTypeDefs = `#graphql
     user_id: String!
     task_id: String!
   }
+
+  input UpdateTaskInput {
+    task_id: String!
+    title: String
+    description: String
+    status: TaskStatus
+    priority: TaskPriority
+    due_date: String
+    assigned_to_id: String
+  }
+
+  
+  type UpdateTaskOfProjectResponse {
+    id: String!
+    title: String!
+    description: String!
+    status: TaskStatus!
+    priority: TaskPriority!
+    due_date: String!
+    project_id: String!
+    assigned_to_id: String!
+    created_at: String!
+    updated_at: String!
+    created_by_id: String!
+  }
+
 `
