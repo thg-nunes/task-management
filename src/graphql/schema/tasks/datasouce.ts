@@ -1,6 +1,11 @@
 import { PostgresDataSource } from '@dataSources/postgres'
 
-import { CreateTaskToProjectInput, Task, UpdateTaskInput } from './types'
+import {
+  CreateTaskToProjectInput,
+  OpenTaskFinishedInput,
+  Task,
+  UpdateTaskInput,
+} from './types'
 import { AppError } from '@utils/appError'
 
 export interface TaskDataSourceMethods {
@@ -202,6 +207,16 @@ export class TaskDataSource
           'BAD_USER_INPUT',
         )
     })
+
+    const userExists = await this.db.users.findUnique({
+      where: { id: updateTaskInput.assigned_to_id },
+    })
+
+    if (!userExists)
+      throw new AppError(
+        `Usuário "${updateTaskInput.assigned_to_id}" não encontrado.`,
+        'NOT_FOUND',
+      )
 
     if (
       taskExists.created_by_id !== user_id &&

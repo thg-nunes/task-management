@@ -1,5 +1,10 @@
 import { Context } from '@context/types'
-import { Task, CreateTaskToProjectInput, UpdateTaskInput } from './types'
+import {
+  Task,
+  CreateTaskToProjectInput,
+  UpdateTaskInput,
+  UpdateTaskAssignedToUserInput,
+} from './types'
 import { userIsAuthenticated } from '@utils/jwt'
 
 // Mutation Resolvers
@@ -42,6 +47,30 @@ const deleteTaskOfProject = async (
   })
 }
 
+const updateTaskAssignedToUser = async (
+  _,
+  {
+    updateTaskAssignedToUserInput: { task_id, assigned_to_id },
+  }: UpdateTaskAssignedToUserInput,
+  { dataSources, req }: Context,
+): Promise<Omit<Task, 'comments'>> => {
+  const { user_id } = userIsAuthenticated(req.headers.cookie)
+
+  return dataSources.taskDataSource.updateTaskOfProject({
+    updateTaskInput: {
+      task_id,
+      assigned_to_id,
+    },
+    user_id,
+  })
+}
+
 export const tasksResolvers = {
-  Mutation: { createTaskToProject, updateTaskOfProject, deleteTaskOfProject },
+  Mutation: {
+    createTaskToProject,
+    updateTaskOfProject,
+    deleteTaskOfProject,
+    updateTaskAssignedToUser,
+  },
+  Task: { comments },
 }
