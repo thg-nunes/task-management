@@ -1,5 +1,5 @@
 import { Context } from '@context/types'
-import { CreateTaskToProjectInput, Task } from './types'
+import { Task, CreateTaskToProjectInput, UpdateTaskInput } from './types'
 import { userIsAuthenticated } from '@utils/jwt'
 
 // Mutation Resolvers
@@ -16,6 +16,19 @@ const createTaskToProject = async (
   })
 }
 
+const updateTaskOfProject = async (
+  _,
+  { updateTaskInput }: UpdateTaskInput,
+  { dataSources, req }: Context,
+): Promise<Omit<Task, 'comments'>> => {
+  const { user_id } = userIsAuthenticated(req.headers.cookie)
+
+  return dataSources.taskDataSource.updateTaskOfProject({
+    updateTaskInput,
+    user_id,
+  })
+}
+
 export const tasksResolvers = {
-  Mutation: { createTaskToProject },
+  Mutation: { createTaskToProject, updateTaskOfProject },
 }
