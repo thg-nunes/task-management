@@ -29,6 +29,19 @@ const updateTaskOfProject = async (
   })
 }
 
+const deleteTaskOfProject = async (
+  _,
+  { task_id }: { task_id: string },
+  { dataSources, req }: Context,
+) => {
+  const { user_id } = userIsAuthenticated(req.headers.cookie)
+
+  return dataSources.taskDataSource.deleteTaskOfProject({
+    task_id,
+    user_id,
+  })
+}
+
 export const tasksResolvers = {
-  Mutation: { createTaskToProject, updateTaskOfProject },
+  Mutation: { createTaskToProject, updateTaskOfProject, deleteTaskOfProject },
 }

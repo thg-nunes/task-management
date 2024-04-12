@@ -12,6 +12,13 @@ export interface TaskDataSourceMethods {
   updateTaskOfProject(
     data: UpdateTaskInput & { user_id: string },
   ): Promise<Omit<Task, 'comments'>>
+
+  deleteTaskOfProject({
+    task_id,
+  }: {
+    task_id: string
+    user_id: string
+  }): Promise<boolean>
 }
 
 export class TaskDataSource
@@ -213,5 +220,44 @@ export class TaskDataSource
         updated_at,
       },
     })
+  }
+
+  async deleteTaskOfProject({
+    task_id,
+    user_id,
+  }: {
+    task_id: string
+    user_id: string
+  }): Promise<boolean> {
+    if (!task_id)
+      throw new AppError(`O task_id é obrigratório.`, 'BAD_USER_INPUT')
+
+    const taskExists = await this.db.tasks.findUnique({
+      where: { id: task_id },
+      select: {
+        created_by_id: true,
+        project: {
+          select: {
+            members: { where: { user_id } },
+          },
+        },
+      },
+    })
+
+    if (!taskExists)
+      throw new AppError(`Task "${task_id}" não encontrada.`, 'NOT_FOUND')
+
+    if (
+      taskExists.project.members[0]?.user_id !== user_id &&
+      taskExists.created_by_id !== user_id
+    )
+      throw new AppError(`Você não pode fazer essa operação.`, 'BAD_REQUEST')
+
+    // deletar a task
+    const taskDeleted = await this.db.tasks.delete({
+      where: { id: task_id },
+    })
+
+    return !!taskDeleted.id
   }
 }
