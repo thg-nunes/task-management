@@ -33,6 +33,10 @@ export interface TaskDataSourceMethods {
     }
     user_id: string
   }): Promise<Omit<Task, 'comments'>>
+
+  openTaskFinished(
+    data: OpenTaskFinishedInput & { user_id: string },
+  ): Promise<Omit<Task, 'comments'>>
 }
 
 export class TaskDataSource
@@ -321,6 +325,54 @@ export class TaskDataSource
     return await this.db.tasks.update({
       where: { id: taskExists.id },
       data: { ...data.updateTaskInput },
+    })
+  }
+
+  async openTaskFinished({
+    user_id,
+    openTaskFinishedInput,
+  }: OpenTaskFinishedInput & { user_id: string }): Promise<
+    Omit<Task, 'comments'>
+  > {
+    const taskExists = await this.db.tasks.findUnique({
+      where: { id: openTaskFinishedInput.task_id },
+      select: {
+        id: true,
+        status: true,
+        created_by_id: true,
+        project: { select: { members: { where: { user_id } } } },
+      },
+    })
+
+    if (!taskExists)
+      throw new AppError(
+        `Task "${openTaskFinishedInput.task_id} não encontrada.`,
+        'NOT_FOUND',
+      )
+
+    if (taskExists.status !== 'FINALIZADA')
+      throw new AppError(
+        `Task "${openTaskFinishedInput.task_id}" ainda está aberta.`,
+        'BAD_REQUEST',
+      )
+
+    if (
+      taskExists.created_by_id !== user_id &&
+      taskExists.project.members[0]?.user_id !== user_id
+    )
+      throw new AppError('Você não pode realizar essa operação.')
+
+    const updated_at = new Date()
+
+    delete openTaskFinishedInput.task_id
+
+    // atualizar o status da task
+    return await this.db.tasks.update({
+      where: { id: taskExists.id },
+      data: {
+        ...openTaskFinishedInput,
+        updated_at,
+      },
     })
   }
 }

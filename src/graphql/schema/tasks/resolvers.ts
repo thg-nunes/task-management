@@ -83,6 +83,19 @@ const updateTaskToFinished = async (
   })
 }
 
+const openTaskFinished = async (
+  _,
+  { openTaskFinishedInput }: OpenTaskFinishedInput,
+  { dataSources, req }: Context,
+): Promise<Omit<Task, 'comments'>> => {
+  const { user_id } = userIsAuthenticated(req.headers.cookie)
+
+  return dataSources.taskDataSource.openTaskFinished({
+    openTaskFinishedInput,
+    user_id,
+  })
+}
+
 export const tasksResolvers = {
   Mutation: {
     createTaskToProject,
@@ -90,6 +103,7 @@ export const tasksResolvers = {
     deleteTaskOfProject,
     updateTaskAssignedToUser,
     updateTaskToFinished,
+    openTaskFinished,
   },
   Task: { comments },
 }
