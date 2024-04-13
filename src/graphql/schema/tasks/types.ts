@@ -53,7 +53,6 @@ export type UpdateTaskInput = {
   }
 }
 
-// essa aqui é pra commitar depois da updateTask toda testada e commitada
 export type UpdateTaskAssignedToUserInput = {
   updateTaskAssignedToUserInput: {
     task_id: string
@@ -61,7 +60,6 @@ export type UpdateTaskAssignedToUserInput = {
   }
 }
 
-// essa aqui é pra commitar depois da UpdateTaskAssignedToUserInput toda testada e commitada
 export type OpenTaskFinishedInput = {
   openTaskFinishedInput: {
     task_id: string
