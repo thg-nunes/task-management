@@ -8,6 +8,16 @@ import {
 } from './types'
 import { userIsAuthenticated } from '@utils/jwt'
 
+const getTasksOfProject = async (
+  _,
+  { project_id }: { project_id: string },
+  { dataSources, req }: Context,
+): Promise<Pick<Task, 'title' | 'description' | 'status' | 'priority'>[]> => {
+  userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.taskDataSource.getTasksOfProject(project_id)
+}
+
 // Mutation Resolvers
 const createTaskToProject = async (
   _,

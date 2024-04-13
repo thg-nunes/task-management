@@ -9,6 +9,11 @@ import {
 import { AppError } from '@utils/appError'
 
 export interface TaskDataSourceMethods {
+  // Query
+  getTasksOfProject(
+    project_id: string,
+  ): Promise<Pick<Task, 'title' | 'description' | 'status' | 'priority'>[]>
+
   // Mutation
   createTaskToProject(
     data: CreateTaskToProjectInput & { user_id: string },
@@ -45,6 +50,32 @@ export class TaskDataSource
 {
   constructor() {
     super()
+  }
+
+  // Query DataSources
+  async getTasksOfProject(
+    project_id: string,
+  ): Promise<Pick<Task, 'title' | 'description' | 'status' | 'priority'>[]> {
+    if (!project_id)
+      throw new AppError('O id do projeto é obrigatório.', 'BAD_USER_INPUT')
+
+    const projectExists = await this.db.tasks.findMany({
+      where: { project_id },
+      select: {
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+      },
+    })
+
+    if (!projectExists.length)
+      throw new AppError(
+        `O projeto "${project_id}" não foi encontrado.`,
+        'NOT_FOUND',
+      )
+
+    return projectExists
   }
 
   // Mutation DataSouces
