@@ -24,6 +24,15 @@ export interface TaskDataSourceMethods {
     task_id: string
     user_id: string
   }): Promise<boolean>
+
+  updateTaskToFinished(data: {
+    updateTaskInput: {
+      task_id: string
+      status: string
+      priority: string
+    }
+    user_id: string
+  }): Promise<Omit<Task, 'comments'>>
 }
 
 export class TaskDataSource
@@ -274,5 +283,44 @@ export class TaskDataSource
     })
 
     return !!taskDeleted.id
+  }
+
+  async updateTaskToFinished(data: {
+    updateTaskInput: { task_id: string; status: string; priority: string }
+    user_id: string
+  }): Promise<Omit<Task, 'comments'>> {
+    const taskExists = await this.db.tasks.findUnique({
+      where: { id: data.updateTaskInput.task_id },
+      select: {
+        id: true,
+        assigned_to_id: true,
+        created_by_id: true,
+        project: {
+          include: {
+            members: { where: { user_id: data.user_id } },
+          },
+        },
+      },
+    })
+
+    if (!taskExists)
+      throw new AppError(
+        `Task "${data.updateTaskInput.task_id}" não encontrada.`,
+        'NOT_FOUND',
+      )
+
+    if (
+      data.user_id !== taskExists.created_by_id &&
+      data.user_id !== taskExists.assigned_to_id &&
+      data.user_id !== taskExists.project.members[0]?.user_id
+    )
+      throw new AppError('Você não pode fazer essa operação.', 'BAD_REQUEST')
+
+    delete data.updateTaskInput.task_id
+
+    return await this.db.tasks.update({
+      where: { id: taskExists.id },
+      data: { ...data.updateTaskInput },
+    })
   }
 }

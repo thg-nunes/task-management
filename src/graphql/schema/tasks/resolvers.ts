@@ -3,6 +3,7 @@ import {
   Task,
   CreateTaskToProjectInput,
   UpdateTaskInput,
+  OpenTaskFinishedInput,
   UpdateTaskAssignedToUserInput,
 } from './types'
 import { userIsAuthenticated } from '@utils/jwt'
@@ -65,12 +66,30 @@ const updateTaskAssignedToUser = async (
   })
 }
 
+const updateTaskToFinished = async (
+  _,
+  { task_id }: { task_id: string },
+  { dataSources, req }: Context,
+): Promise<Omit<Task, 'comments'>> => {
+  const { user_id } = userIsAuthenticated(req.headers.cookie)
+
+  return dataSources.taskDataSource.updateTaskToFinished({
+    updateTaskInput: {
+      task_id,
+      status: 'FINALIZADA',
+      priority: 'Baixa',
+    },
+    user_id,
+  })
+}
+
 export const tasksResolvers = {
   Mutation: {
     createTaskToProject,
     updateTaskOfProject,
     deleteTaskOfProject,
     updateTaskAssignedToUser,
+    updateTaskToFinished,
   },
   Task: { comments },
 }
