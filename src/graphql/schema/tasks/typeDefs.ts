@@ -5,6 +5,7 @@ export const tasksTypeDefs = `#graphql
     updateTaskOfProject(updateTaskInput: UpdateTaskInput!): UpdateTaskOfProjectResponse!
     deleteTaskOfProject(task_id: String!): Boolean!
     updateTaskAssignedToUser(updateTaskAssignedToUserInput: UpdateTaskAssignedToUserInput!): Task!
+    updateTaskToFinished(task_id: String!): UpdateTaskOfProjectResponse!
   }
 
   enum TaskStatus {
