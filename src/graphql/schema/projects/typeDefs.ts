@@ -29,12 +29,16 @@ export const projectsTypedefs = `#graphql
     created_at: String
     updated_at: String
     members: [ProjectMembers]
+    author: User
     author_id: String!
+    tasks: [Task!]
   }
 
   type ProjectMembers {
     user_id: String!
+    user: User
     project_id: String!
+    project: Project
   }
   
   enum CreateProjectStatus {

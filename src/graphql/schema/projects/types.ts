@@ -1,6 +1,7 @@
+import { Task } from '@schema/tasks/types'
 import { User } from '@schema/users/types'
 
-export type Project = {
+export type Project = Partial<{
   id: string
   name: string
   description: string
@@ -12,14 +13,18 @@ export type Project = {
   delivery_date: Date | null
   status: string | null
   members: ProjectMembers[]
-  category: Array<string> | []
+  author: User
   author_id: string
-}
+  category: Array<string> | []
+  tasks: Array<Task>
+}>
 
-export type ProjectMembers = {
+export type ProjectMembers = Partial<{
   user_id: string
+  user: User
   project_id: string
-}
+  project: Project
+}>
 
 export type CreateProjectInput = {
   projectData: {
@@ -47,7 +52,7 @@ export type CreateProjectMemberErrorResponse = {
 
 export type CreateProjectMemberSuccessResponse = {
   usersMembersList: {
-    user: Omit<User, 'token' | 'refresh_token'>
+    user: User
   }[]
 }
 

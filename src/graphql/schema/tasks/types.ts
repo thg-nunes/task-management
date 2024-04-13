@@ -1,3 +1,6 @@
+import { Project } from '@schema/projects/types'
+import { User } from '@schema/users/types'
+
 export type GetTasksOfProjectResponse = {
   title: string
   description: string
@@ -5,7 +8,7 @@ export type GetTasksOfProjectResponse = {
   priority: string
 }
 
-export type Task = {
+export type Task = Partial<{
   id: string
   title: string
   description: string
@@ -13,12 +16,14 @@ export type Task = {
   priority: string
   due_date: Date
   comments: Array<Comment>
+  project: Project
   project_id: string
+  assigned_to: User
   assigned_to_id: string
   created_by_id: string
   created_at: Date
   updated_at: Date
-}
+}>
 
 export type CreateTaskToProjectInput = {
   createTaskToProjectData: {
@@ -32,14 +37,16 @@ export type CreateTaskToProjectInput = {
   }
 }
 
-export type Comment = {
+export type Comment = Partial<{
   id: string
-  comment?: string
+  comment: string
   created_at: Date
   updated_at: Date
   user_id: string
+  createdBy: User
   task_id: string
-}
+  task: Task
+}>
 
 export type UpdateTaskInput = {
   updateTaskInput: {

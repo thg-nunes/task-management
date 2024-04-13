@@ -1,3 +1,7 @@
+// [] criar um campo na db para adicionar uma foto
+// [] no updateProfile criar um campo para receber um foto
+// [] armazenar a foto na db
+
 export const usersTypeDefs = `#graphql
   extend type Mutation {
     sign(signData: SignInput!): SignResponse!
@@ -23,6 +27,12 @@ export const usersTypeDefs = `#graphql
     email: String!
     created_at: String!
     updated_at: String!
+    token: String!
+    refresh_token: String!
+    projects_member: [ProjectMembers!]!
+    projects_author: [Project!]!
+    comments_creted: [Comment]!
+    tasks: [Task]!
   }
 
   input CreateUserInput {

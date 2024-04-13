@@ -1,3 +1,22 @@
+// [] - Queries (Consultas):
+// [] - Filtrar Tarefas: Query para filtrar as tarefas com base em critérios específicos, como status, prioridade, responsável, etc.
+// [] - Tarefas Atribuídas ao Usuário: Query para obter uma lista de tarefas atribuídas a um usuário específico.
+
+// [] - Subscriptions (Assinaturas):
+// [] - Assinar Tarefas Atualizadas: Subscription para receber notificações em tempo real sempre que uma tarefa for atualizada, adicionada ou excluída.
+// [] - Assinar Tarefas Atribuídas ao Usuário: Subscription para receber notificações quando uma nova tarefa for atribuída ao usuário atual.
+// [] - Implemente uma mutation que permita aos usuários reordenar as tarefas dentro de um projeto, alterando sua posição na lista.s
+
+// Parte de Comentários:
+
+// Mutation para adicionar um novo comentário a uma tarefa específica. Você precisará passar o conteúdo do comentário, o ID da tarefa à qual o comentário está associado e, opcionalmente, o ID do usuário que criou o comentário.
+// Query para Listar Comentários:
+
+// Query para recuperar uma lista de todos os comentários associados a uma determinada tarefa. Você precisará passar o ID da tarefa para obter os comentários correspondentes.
+// Mutation para Excluir Comentário:
+
+// Mutation para excluir um comentário específico de uma tarefa. Você precisará passar o ID do comentário que deseja excluir.
+
 export const tasksTypeDefs = `#graphql
   extend type Query {
     getTasksOfProject(project_id: String!): [GetTasksOfProjectResponse!]!
@@ -40,7 +59,9 @@ export const tasksTypeDefs = `#graphql
     priority: TaskPriority!
     due_date: String!
     comments: [Comment!]!
+    project: Project!
     project_id: String!
+    assigned_to: User!
     assigned_to_id: String!
     created_at: String!
     updated_at: String!
@@ -63,7 +84,9 @@ export const tasksTypeDefs = `#graphql
     created_at: String!
     updated_at: String!
     user_id: String!
+    createdBy: User
     task_id: String!
+    task: Task
   }
 
   input UpdateTaskInput {

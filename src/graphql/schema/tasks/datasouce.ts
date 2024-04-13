@@ -283,22 +283,14 @@ export class TaskDataSource
 
     const taskExists = await this.db.tasks.findUnique({
       where: { id: updateTaskInput.task_id },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        status: true,
-        priority: true,
-        due_date: true,
-        project_id: true,
-        assigned_to_id: true,
-        created_by_id: true,
-        created_at: true,
-        updated_at: true,
+      include: {
         project: {
-          select: {
+          include: {
             members: {
               where: { user_id },
+              select: {
+                user_id: true,
+              },
             },
           },
         },

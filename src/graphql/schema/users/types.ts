@@ -1,4 +1,8 @@
-export type User = {
+import { Comments, Projects } from '@prisma/client'
+import { ProjectMembers } from '@schema/projects/types'
+import { Task } from '@schema/tasks/types'
+
+export type User = Partial<{
   id: string
   username: string
   email: string
@@ -6,7 +10,11 @@ export type User = {
   refresh_token?: string
   created_at: Date
   updated_at: Date
-}
+  projects_member: Array<ProjectMembers>
+  projects_author: Array<Projects>
+  comments_creted: Array<Comments>
+  tasks: Array<Task>
+}>
 
 export type CreateUserInput = {
   userData: {

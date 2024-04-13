@@ -1,4 +1,4 @@
-import { GraphQLError, GraphQLErrorOptions } from 'graphql'
+import { GraphQLError } from 'graphql'
 
 type ErrorsCode = 'BAD_REQUEST' | 'BAD_USER_INPUT' | 'FORBIDDEN' | 'NOT_FOUND'
 

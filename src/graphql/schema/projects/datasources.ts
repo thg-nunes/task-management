@@ -283,7 +283,6 @@ export class ProjectsDataSource
       select: {
         user: {
           select: {
-            id: true,
             email: true,
             username: true,
             created_at: true,
