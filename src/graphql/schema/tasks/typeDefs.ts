@@ -1,6 +1,7 @@
 export const tasksTypeDefs = `#graphql
   extend type Query {
     getTasksOfProject(project_id: String!): [GetTasksOfProjectResponse!]!
+    getTaskDetails(project_id: String!): [Task!]!
   }
 
   extend type Mutation {

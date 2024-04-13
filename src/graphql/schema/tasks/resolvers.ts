@@ -3,6 +3,7 @@ import {
   Task,
   CreateTaskToProjectInput,
   UpdateTaskInput,
+  Comment,
   OpenTaskFinishedInput,
   UpdateTaskAssignedToUserInput,
 } from './types'
@@ -16,6 +17,26 @@ const getTasksOfProject = async (
   userIsAuthenticated(req.headers.cookie)
 
   return await dataSources.taskDataSource.getTasksOfProject(project_id)
+}
+
+const getTaskDetails = async (
+  _,
+  { project_id }: { project_id: string },
+  { dataSources, req }: Context,
+) => {
+  userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.taskDataSource.getTaskDetails(project_id)
+}
+
+const comments = async (
+  { id: task_id }: { id: string },
+  _,
+  { dataSources, req }: Context,
+): Promise<Array<Comment>> => {
+  userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.taskDataSource.getTaskComments(task_id)
 }
 
 // Mutation Resolvers
@@ -107,6 +128,7 @@ const openTaskFinished = async (
 }
 
 export const tasksResolvers = {
+  Query: { getTasksOfProject, getTaskDetails },
   Mutation: {
     createTaskToProject,
     updateTaskOfProject,

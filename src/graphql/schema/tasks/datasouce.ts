@@ -1,6 +1,7 @@
 import { PostgresDataSource } from '@dataSources/postgres'
 
 import {
+  Comment,
   CreateTaskToProjectInput,
   OpenTaskFinishedInput,
   Task,
@@ -13,6 +14,8 @@ export interface TaskDataSourceMethods {
   getTasksOfProject(
     project_id: string,
   ): Promise<Pick<Task, 'title' | 'description' | 'status' | 'priority'>[]>
+  getTaskDetails(project_id: string)
+  getTaskComments(task_id: string): Promise<Comment[]>
 
   // Mutation
   createTaskToProject(
@@ -78,6 +81,76 @@ export class TaskDataSource
     return projectExists
   }
 
+  async getTaskDetails(project_id: string) {
+    const projectExists = await this.db.tasks.findMany({
+      where: { project_id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        due_date: true,
+        comments: {
+          select: {
+            comment: true,
+            createdBy: {
+              select: {
+                username: true,
+                created_at: true,
+              },
+            },
+          },
+        },
+        assigned_to: {
+          select: {
+            username: true,
+            email: true,
+          },
+        },
+        project_id: true,
+        updated_at: true,
+        project: {
+          select: {
+            name: true,
+            observations: true,
+            start_date: true,
+            delivery_date: true,
+            description: true,
+            category: true,
+            members: {
+              select: {
+                user: {
+                  select: {
+                    email: true,
+                    username: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        assigned_to_id: true,
+        created_at: true,
+        created_by_id: true,
+      },
+    })
+
+    if (!projectExists.length)
+      throw new AppError(
+        `O projeto "${project_id}" não foi encontrado.`,
+        'NOT_FOUND',
+      )
+
+    return projectExists
+  }
+
+  async getTaskComments(task_id: string): Promise<Comment[]> {
+    return await this.db.comments.findMany({
+      where: { task_id },
+    })
+  }
+
   // Mutation DataSouces
   async createTaskToProject({
     createTaskToProjectData,
@@ -107,8 +180,7 @@ export class TaskDataSource
         author_id: true,
         members: {
           where: {
-            user_id,
-            OR: [{ user_id: createTaskToProjectData.assigned_to_id }],
+            user_id: createTaskToProjectData.assigned_to_id,
           },
           select: { user_id: true },
         },
