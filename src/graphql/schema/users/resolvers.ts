@@ -3,12 +3,19 @@ import {
   CreateUserInput,
   SignInput,
   SignResponse,
+  User,
   UserUpdateProfileInput,
 } from './types'
-import { AppError } from '@utils/appError'
 import { userIsAuthenticated } from '@utils/jwt'
 
 // Query Resolvers
+const getUser = async (
+  _,
+  { user_id }: { user_id: string },
+  { dataSources }: Context,
+): Promise<User> => {
+  return await dataSources.usersDataSource.getUser(user_id)
+}
 
 // Mutations Resolvers
 const sign = async (
@@ -78,5 +85,6 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
 }
 
 export const usersResolvers = {
+  Query: { getUser },
   Mutation: { sign, signOut, createUser, updateProfile, deleteProfile },
 }

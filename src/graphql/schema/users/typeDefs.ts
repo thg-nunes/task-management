@@ -3,6 +3,10 @@
 // [] armazenar a foto na db
 
 export const usersTypeDefs = `#graphql
+  extend type Query {
+    getUser(user_id: String!): User!
+  }
+
   extend type Mutation {
     sign(signData: SignInput!): SignResponse!
     createUser(userData: CreateUserInput!): User!

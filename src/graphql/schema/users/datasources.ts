@@ -17,6 +17,7 @@ import { AppError } from '@utils/appError'
 type CreateUserData = Pick<CreateUserInput, 'userData'>
 
 export interface UsersDataSourceMethods {
+  getUser(user_id: string): Promise<User>
   refreshToken(refresh_token: string): Promise<{
     token: string
     refresh_token: string
@@ -39,6 +40,13 @@ export class UsersDataSource
 {
   constructor() {
     super()
+  }
+  async getUser(user_id: string): Promise<Partial<User>> {
+    const user = await this.db.users.findUnique({ where: { id: user_id } })
+    if (!user)
+      throw new AppError(`User "${user_id}" não encontrado.`, 'NOT_FOUND')
+
+    return user
   }
 
   async createUser(
