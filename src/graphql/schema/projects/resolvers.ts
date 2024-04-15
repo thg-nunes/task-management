@@ -8,6 +8,14 @@ import {
 import { userIsAuthenticated } from '@utils/jwt'
 
 // Query Resolvers
+const getProject = async (
+  _,
+  { project_id }: { project_id: string },
+  { dataSources, req }: Context,
+) => {
+  return await dataSources.projectsDataSource.getProject(project_id)
+}
+
 const viewAllMembersOfProject = async (
   _,
   { project_id }: { project_id: string },
@@ -87,7 +95,7 @@ export const updateProject = async (
 }
 
 export const projectsResolvers = {
-  Query: { viewAllMembersOfProject },
+  Query: { viewAllMembersOfProject, getProject },
   Mutation: {
     createProject,
     createProjectMember,

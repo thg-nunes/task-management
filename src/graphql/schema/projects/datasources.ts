@@ -6,6 +6,7 @@ import * as ProjectTypes from './types'
 import { User } from '@schema/users/types'
 
 export interface PostgresDataSourceMethods {
+  getProject(project_id: string): Promise<ProjectTypes.Project>
   viewAllMembersOfProject(project_id: string): Promise<{
     members: { user: User }[]
   }>
@@ -43,6 +44,20 @@ export class ProjectsDataSource
 {
   constructor() {
     super()
+  }
+
+  async getProject(project_id: string): Promise<ProjectTypes.Project> {
+    const project = await this.db.projects.findUnique({
+      where: { id: project_id },
+    })
+
+    if (!project)
+      throw new AppError(
+        `Projeto de id "${project_id}" não encontrado.`,
+        'NOT_FOUND',
+      )
+
+    return project
   }
 
   async updateProject({

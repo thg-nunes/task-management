@@ -1,5 +1,6 @@
 export const projectsTypedefs = `#graphql
   extend type Query {
+    getProject(project_id: String!): Project!
     viewAllMembersOfProject(project_id: String!): ViewAllMembersOfProjectResponse
   }
 
