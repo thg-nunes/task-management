@@ -5,6 +5,7 @@ import {
   CreateTaskToProjectInput,
   OpenTaskFinishedInput,
   Task,
+  TasksOfUserInput,
   UpdateTaskInput,
 } from './types'
 import { AppError } from '@utils/appError'
@@ -16,6 +17,11 @@ export interface TaskDataSourceMethods {
   ): Promise<Pick<Task, 'title' | 'description' | 'status' | 'priority'>[]>
   getTaskDetails(project_id: string)
   getTaskComments(task_id: string): Promise<Comment[]>
+  getTasksOfUser(
+    data: TasksOfUserInput & {
+      loggedUserId: string
+    },
+  ): Promise<Array<Task>>
 
   // Mutation
   createTaskToProject(
@@ -149,6 +155,46 @@ export class TaskDataSource
     return await this.db.comments.findMany({
       where: { task_id },
     })
+  }
+
+  async getTasksOfUser({
+    loggedUserId,
+    tasksOfUserInput: { project_id, user_id },
+  }: TasksOfUserInput & {
+    loggedUserId: string
+  }): Promise<Array<Task>> {
+    const userLoggedIsMemberOrAuthorOfProject =
+      await this.db.projects.findUnique({
+        where: { id: project_id },
+        select: {
+          author_id: true,
+          members: { where: { user_id: loggedUserId } },
+        },
+      })
+
+    if (!userLoggedIsMemberOrAuthorOfProject)
+      throw new AppError(`Projeto "${project_id}" não encontrado.`, 'NOT_FOUND')
+
+    if (
+      userLoggedIsMemberOrAuthorOfProject.author_id !== loggedUserId &&
+      userLoggedIsMemberOrAuthorOfProject.members[0]?.user_id !== loggedUserId
+    )
+      throw new AppError(
+        'Você não pode visualizar essas informações.',
+        'BAD_REQUEST',
+      )
+
+    const tasks = await this.db.tasks.findMany({
+      where: { assigned_to_id: user_id },
+    })
+
+    if (!tasks.length)
+      throw new AppError(
+        `Tasks do user "${user_id}" não encontradas.`,
+        'NOT_FOUND',
+      )
+
+    return tasks
   }
 
   // Mutation DataSouces

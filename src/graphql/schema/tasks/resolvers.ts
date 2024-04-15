@@ -6,6 +6,7 @@ import {
   Comment,
   OpenTaskFinishedInput,
   UpdateTaskAssignedToUserInput,
+  TasksOfUserInput,
 } from './types'
 import { userIsAuthenticated } from '@utils/jwt'
 
@@ -37,6 +38,31 @@ const comments = async (
   userIsAuthenticated(req.headers.cookie)
 
   return await dataSources.taskDataSource.getTaskComments(task_id)
+}
+
+const getTasksOfUser = async (
+  _,
+  { tasksOfUserInput }: TasksOfUserInput,
+  { req, dataSources }: Context,
+) => {
+  const { user_id: loggedUserId } = userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.taskDataSource.getTasksOfUser({
+    tasksOfUserInput,
+    loggedUserId,
+  })
+}
+
+const project = async ({ project_id }: Task, _, { dataSources }: Context) => {
+  return await dataSources.projectsDataSource.getProject(project_id)
+}
+
+const assigned_to = async (
+  { assigned_to_id }: Task,
+  _,
+  { dataSources }: Context,
+) => {
+  return await dataSources.usersDataSource.getUser(assigned_to_id)
 }
 
 // Mutation Resolvers
@@ -128,7 +154,7 @@ const openTaskFinished = async (
 }
 
 export const tasksResolvers = {
-  Query: { getTasksOfProject, getTaskDetails },
+  Query: { getTasksOfProject, getTaskDetails, getTasksOfUser },
   Mutation: {
     createTaskToProject,
     updateTaskOfProject,
@@ -137,5 +163,5 @@ export const tasksResolvers = {
     updateTaskToFinished,
     openTaskFinished,
   },
-  Task: { comments },
+  Task: { comments, project, assigned_to },
 }
