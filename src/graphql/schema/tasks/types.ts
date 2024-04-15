@@ -74,3 +74,10 @@ export type OpenTaskFinishedInput = {
     status: string
   }
 }
+
+export type TasksOfUserInput = {
+  tasksOfUserInput: {
+    user_id: string
+    project_id: string
+  }
+}

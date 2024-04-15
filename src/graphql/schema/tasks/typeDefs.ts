@@ -1,14 +1,10 @@
 // [] - Queries (Consultas):
-// [] - Filtrar Tarefas: Query para filtrar as tarefas com base em critérios específicos, como status, prioridade, responsável, etc.
-// [] - Tarefas Atribuídas ao Usuário: Query para obter uma lista de tarefas atribuídas a um usuário específico.
-
 // [] - Subscriptions (Assinaturas):
 // [] - Assinar Tarefas Atualizadas: Subscription para receber notificações em tempo real sempre que uma tarefa for atualizada, adicionada ou excluída.
 // [] - Assinar Tarefas Atribuídas ao Usuário: Subscription para receber notificações quando uma nova tarefa for atribuída ao usuário atual.
 // [] - Implemente uma mutation que permita aos usuários reordenar as tarefas dentro de um projeto, alterando sua posição na lista.s
 
 // Parte de Comentários:
-
 // Mutation para adicionar um novo comentário a uma tarefa específica. Você precisará passar o conteúdo do comentário, o ID da tarefa à qual o comentário está associado e, opcionalmente, o ID do usuário que criou o comentário.
 // Query para Listar Comentários:
 
@@ -21,6 +17,7 @@ export const tasksTypeDefs = `#graphql
   extend type Query {
     getTasksOfProject(project_id: String!): [GetTasksOfProjectResponse!]!
     getTaskDetails(project_id: String!): [Task!]!
+    getTasksOfUser(tasksOfUserInput: TasksOfUserInput!): [Task!]!
   }
 
   extend type Mutation {
@@ -123,5 +120,10 @@ export const tasksTypeDefs = `#graphql
     task_id: String!
     priority: TaskPriority
     status: TaskStatus!
+  }
+
+  input TasksOfUserInput {
+    user_id: String!
+    project_id: String!
   }
 `
