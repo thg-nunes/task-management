@@ -18,6 +18,7 @@ type CreateUserData = Pick<CreateUserInput, 'userData'>
 
 export interface UsersDataSourceMethods {
   getUser(user_id: string): Promise<User>
+  getUsers(): Promise<Partial<Array<User>>>
   refreshToken(refresh_token: string): Promise<{
     token: string
     refresh_token: string
@@ -47,6 +48,10 @@ export class UsersDataSource
       throw new AppError(`User "${user_id}" não encontrado.`, 'NOT_FOUND')
 
     return user
+  }
+
+  async getUsers(): Promise<Partial<Array<User>>> {
+    return await this.db.users.findMany()
   }
 
   async createUser(
