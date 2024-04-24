@@ -10,7 +10,7 @@ import {
 } from './types'
 import { AppError } from '@utils/appError'
 
-export interface TaskDataSourceMethods {
+export interface TaskDataSourceMethods extends PostgresDataSource {
   // Query
   getTasksOfProject(
     project_id: string,
@@ -149,6 +149,16 @@ export class TaskDataSource
       )
 
     return projectExists
+  }
+
+  async batchLoaderCallback(user_ids: string[]): Promise<Task[][]> {
+    const tasksOfUser = await this.db.tasks.findMany({
+      where: { assigned_to_id: { in: user_ids.map((id) => id) } },
+    })
+    const tasks: Task[] = tasksOfUser.map((task) => task as Task)
+    return user_ids.map((id) =>
+      tasks.filter((task) => task.assigned_to_id === id),
+    )
   }
 
   async getTaskComments(task_id: string): Promise<Comment[]> {
