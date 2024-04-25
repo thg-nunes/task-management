@@ -527,7 +527,7 @@ export class TaskDataSource
     return _ids.map((id) => tasks.filter((task) => task.assigned_to_id === id))
   })
 
-  batchLoadTasks<T>(id: string) {
+  batchLoadTasks(id: string) {
     return this.tasksLoader.load(id)
   }
 }
