@@ -96,7 +96,11 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
 }
 
 // Field Resolvers
-const tasks = async ({ id }: User, __, { dataSources, req }: Context) => {
+const tasks = async (
+  { id }: User,
+  __,
+  { dataSources, req }: Context,
+): Promise<Task[]> => {
   userIsAuthenticated(req.headers.cookie)
   return dataSources.taskDataSource.batchLoadTasks<Promise<Task[]>>(id)
 }
