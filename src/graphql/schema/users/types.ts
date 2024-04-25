@@ -1,5 +1,5 @@
 import { Comments, Projects } from '@prisma/client'
-import { ProjectMembers } from '@schema/projects/types'
+import { Project } from '@schema/projects/types'
 import { Task } from '@schema/tasks/types'
 
 export type User = Partial<{
@@ -10,7 +10,7 @@ export type User = Partial<{
   refresh_token?: string
   created_at: Date
   updated_at: Date
-  projects_member: Array<ProjectMembers>
+  projects_member: Array<Project>
   projects_author: Array<Projects>
   comments_creted: Array<Comments>
   tasks: Array<Task>
