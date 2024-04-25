@@ -11,16 +11,12 @@ export class PostgresDataSource {
     this.db = prisma
   }
 
-  private instanceLoader = new DataLoader(async (ids) => {
-    const _ids = ids as string[]
-    return await this.batchLoaderCallback(_ids.map((id) => id))
-  })
-
-  batchLoad<T>(id: string) {
-    return this.instanceLoader.load(id)
-  }
-
-  protected async batchLoaderCallback(ids: string[]) {
-    return null
+  protected createInstanceLoader = <T>(
+    batchLoaderCallback: (ids: string[]) => Promise<any>,
+  ) => {
+    return new DataLoader<string, T>(async (ids) => {
+      const _ids = ids as string[]
+      return await batchLoaderCallback(_ids.map((id) => id))
+    })
   }
 }

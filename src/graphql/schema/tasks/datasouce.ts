@@ -10,7 +10,7 @@ import {
 } from './types'
 import { AppError } from '@utils/appError'
 
-export interface TaskDataSourceMethods extends PostgresDataSource {
+export interface TaskDataSourceMethods {
   // Query
   getTasksOfProject(
     project_id: string,
@@ -22,7 +22,7 @@ export interface TaskDataSourceMethods extends PostgresDataSource {
       loggedUserId: string
     },
   ): Promise<Array<Task>>
-
+  batchLoadTasks<T>(id: string): Promise<Task[]>
   // Mutation
   createTaskToProject(
     data: CreateTaskToProjectInput & { user_id: string },
@@ -149,16 +149,6 @@ export class TaskDataSource
       )
 
     return projectExists
-  }
-
-  async batchLoaderCallback(user_ids: string[]): Promise<Task[][]> {
-    const tasksOfUser = await this.db.tasks.findMany({
-      where: { assigned_to_id: { in: user_ids.map((id) => id) } },
-    })
-    const tasks: Task[] = tasksOfUser.map((task) => task as Task)
-    return user_ids.map((id) =>
-      tasks.filter((task) => task.assigned_to_id === id),
-    )
   }
 
   async getTaskComments(task_id: string): Promise<Comment[]> {
@@ -525,5 +515,19 @@ export class TaskDataSource
         updated_at,
       },
     })
+  }
+
+  // fields resolvers
+  private tasksLoader = this.createInstanceLoader<Task[]>(async (ids) => {
+    const _ids = ids as string[]
+    const tasksOfUser = await this.db.tasks.findMany({
+      where: { assigned_to_id: { in: _ids.map((id) => id) } },
+    })
+    const tasks: Task[] = tasksOfUser.map((task) => task as Task)
+    return _ids.map((id) => tasks.filter((task) => task.assigned_to_id === id))
+  })
+
+  batchLoadTasks<T>(id: string) {
+    return this.tasksLoader.load(id)
   }
 }

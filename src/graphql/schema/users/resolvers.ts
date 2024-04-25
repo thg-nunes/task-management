@@ -1,4 +1,5 @@
 import { Context } from '@context/types'
+import { Task } from '@schema/tasks/types'
 import {
   CreateUserInput,
   SignInput,
@@ -7,7 +8,6 @@ import {
   UserUpdateProfileInput,
 } from './types'
 import { userIsAuthenticated } from '@utils/jwt'
-import { Task } from '@schema/tasks/types'
 
 // Query Resolvers
 const getUser = async (
@@ -97,7 +97,7 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
 // Field Resolvers
 const tasks = async ({ id }: User, __, { dataSources, req }: Context) => {
   userIsAuthenticated(req.headers.cookie)
-  return dataSources.taskDataSource.batchLoad<Promise<Task[][]>>(id)
+  return dataSources.taskDataSource.batchLoadTasks<Promise<Task[][]>>(id)
 }
 
 export const usersResolvers = {
