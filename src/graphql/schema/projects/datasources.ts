@@ -36,6 +36,7 @@ export interface PostgresDataSourceMethods {
       userLoggedId: string
     },
   ): Promise<ProjectTypes.RemoveMemberOfProjectResponse>
+  batchLoadProjectsMember(user_id: string): Promise<ProjectTypes.Project[]>
 }
 
 export class ProjectsDataSource
@@ -369,5 +370,28 @@ export class ProjectsDataSource
       removed: !!memberDeleted.user_id,
       member_id: memberDeleted.user_id,
     }
+  }
+
+  private projectsMemberLoader = this.createInstanceLoader<
+    ProjectTypes.Project[]
+  >(async (userIds) => {
+    const _userIds = userIds as string[]
+    const userMemberOfProjects = await this.db.userMemberOfProjects.findMany({
+      where: { user_id: { in: _userIds } },
+      select: { project: true, user_id: true },
+    })
+
+    return _userIds.map((userId) => {
+      const projectsUserMemeber: ProjectTypes.Project[] = []
+      userMemberOfProjects.filter((project) => {
+        if (userId === project.user_id)
+          projectsUserMemeber.push(project.project)
+      })
+      return projectsUserMemeber
+    })
+  })
+
+  batchLoadProjectsMember(user_id: string): Promise<ProjectTypes.Project[]> {
+    return this.projectsMemberLoader.load(user_id)
   }
 }

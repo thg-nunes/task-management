@@ -8,6 +8,7 @@ import {
   UserUpdateProfileInput,
 } from './types'
 import { userIsAuthenticated } from '@utils/jwt'
+import { Project } from '@schema/projects/types'
 
 // Query Resolvers
 const getUser = async (
@@ -97,11 +98,20 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
 // Field Resolvers
 const tasks = async ({ id }: User, __, { dataSources, req }: Context) => {
   userIsAuthenticated(req.headers.cookie)
-  return dataSources.taskDataSource.batchLoadTasks<Promise<Task[][]>>(id)
+  return dataSources.taskDataSource.batchLoadTasks<Promise<Task[]>>(id)
+}
+
+const projects_member = async (
+  { id }: User,
+  __,
+  { dataSources, req }: Context,
+): Promise<Project[]> => {
+  userIsAuthenticated(req.headers.cookie)
+  return dataSources.projectsDataSource.batchLoadProjectsMember(id)
 }
 
 export const usersResolvers = {
   Query: { getUser, getUsers },
   Mutation: { sign, signOut, createUser, updateProfile, deleteProfile },
-  User: { tasks },
+  User: { tasks, projects_member },
 }
