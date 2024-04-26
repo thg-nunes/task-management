@@ -16,7 +16,7 @@ model Users {
   refresh_token String?
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
-  projects_member UserMemberOfProjects[]
+  member_of_projects UserMemberOfProjects[]
   author_of_projects Projects[]
   comments_creted Comments[]
   tasks Tasks[]

@@ -105,13 +105,12 @@ const tasks = async (
   return dataSources.taskDataSource.batchLoadTasks<Promise<Task[]>>(id)
 }
 
-const projects_member = async (
+const member_of_projects = async (
   { id }: User,
   __,
   { dataSources, req }: Context,
 ): Promise<Project[]> => {
   userIsAuthenticated(req.headers.cookie)
-  // @ts-expect-error
   return dataSources.projectsDataSource.batchLoadProjectsMember(id)
 }
 
@@ -127,5 +126,5 @@ const author_of_projects = async (
 export const usersResolvers = {
   Query: { getUser, getUsers },
   Mutation: { sign, signOut, createUser, updateProfile, deleteProfile },
-  User: { tasks, projects_member, author_of_projects },
+  User: { tasks, member_of_projects, author_of_projects },
 }

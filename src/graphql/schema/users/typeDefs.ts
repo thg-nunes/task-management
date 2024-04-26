@@ -34,7 +34,7 @@ export const usersTypeDefs = `#graphql
     updated_at: String!
     token: String!
     refresh_token: String!
-    projects_member: [Project!]!
+    member_of_projects: [Project!]!
     author_of_projects: [Project!]!
     comments_creted: [Comment]!
     tasks: [Task]!
