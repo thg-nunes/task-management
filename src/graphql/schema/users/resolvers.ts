@@ -111,7 +111,7 @@ const member_of_projects = async (
   { dataSources, req }: Context,
 ): Promise<Project[]> => {
   userIsAuthenticated(req.headers.cookie)
-  return dataSources.projectsDataSource.batchLoadProjectsMember(id)
+  return dataSources.projectsDataSource.batchLoadMemberOfProjects(id)
 }
 
 const author_of_projects = async (

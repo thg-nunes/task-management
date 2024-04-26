@@ -40,7 +40,7 @@ export interface PostgresDataSourceMethods {
   batchLoadAuthorOfProjects(
     project_id: string,
   ): Promise<Array<ProjectTypes.Project>>
-  batchLoadProjectsMember(
+  batchLoadMemberOfProjects(
     project_id: string,
   ): Promise<Array<ProjectTypes.Project>>
 }
@@ -400,7 +400,7 @@ export class ProjectsDataSource
     return await this.authorOfProjectsLoader.load(project_id)
   }
 
-  private projectsMemberLoader = this.createInstanceLoader<
+  private memberOfProjectsLoader = this.createInstanceLoader<
     Array<ProjectTypes.Project>
   >(async (ids) => {
     const userMemberOfProjects = await this.db.userMemberOfProjects.findMany({
@@ -417,9 +417,9 @@ export class ProjectsDataSource
     })
   })
 
-  async batchLoadProjectsMember(
+  async batchLoadMemberOfProjects(
     project_id: string,
   ): Promise<Array<ProjectTypes.Project>> {
-    return await this.projectsMemberLoader.load(project_id)
+    return await this.memberOfProjectsLoader.load(project_id)
   }
 }
