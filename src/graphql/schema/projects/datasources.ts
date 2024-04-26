@@ -1,12 +1,13 @@
 import { PostgresDataSource } from '@dataSources/postgres'
 
+import { User } from '@schema/users/types'
 import { AppError } from '@utils/appError'
 
 import * as ProjectTypes from './types'
-import { User } from '@schema/users/types'
 
 export interface PostgresDataSourceMethods {
   getProject(project_id: string): Promise<ProjectTypes.Project>
+  getProjects(): Promise<Array<ProjectTypes.Project>>
   viewAllMembersOfProject(project_id: string): Promise<{
     members: { user: User }[]
   }>
@@ -36,7 +37,9 @@ export interface PostgresDataSourceMethods {
       userLoggedId: string
     },
   ): Promise<ProjectTypes.RemoveMemberOfProjectResponse>
-  batchLoadProjectsMember(user_id: string): Promise<ProjectTypes.Project[]>
+  batchLoadAuthorOfProjects(
+    project_id: string,
+  ): Promise<Array<ProjectTypes.Project>>
 }
 
 export class ProjectsDataSource
@@ -59,6 +62,10 @@ export class ProjectsDataSource
       )
 
     return project
+  }
+
+  async getProjects(): Promise<Array<ProjectTypes.Project>> {
+    return await this.db.projects.findMany()
   }
 
   async updateProject({
@@ -372,26 +379,21 @@ export class ProjectsDataSource
     }
   }
 
-  private projectsMemberLoader = this.createInstanceLoader<
-    ProjectTypes.Project[]
-  >(async (userIds) => {
-    const _userIds = userIds as string[]
-    const userMemberOfProjects = await this.db.userMemberOfProjects.findMany({
-      where: { user_id: { in: _userIds } },
-      select: { project: true, user_id: true },
+  private authorOfProjectsLoader = this.createInstanceLoader<
+    Array<ProjectTypes.Project>
+  >(async (ids) => {
+    const projectsByAuthorId = await this.db.projects.findMany({
+      where: { author_id: { in: ids } },
     })
 
-    return _userIds.map((userId) => {
-      const projectsUserMemeber: ProjectTypes.Project[] = []
-      userMemberOfProjects.filter((project) => {
-        if (userId === project.user_id)
-          projectsUserMemeber.push(project.project)
-      })
-      return projectsUserMemeber
-    })
+    return ids.map((id) =>
+      projectsByAuthorId.filter((project) => project.author_id === id),
+    )
   })
 
-  batchLoadProjectsMember(user_id: string): Promise<ProjectTypes.Project[]> {
-    return this.projectsMemberLoader.load(user_id)
+  async batchLoadAuthorOfProjects(
+    project_id: string,
+  ): Promise<Array<ProjectTypes.Project>> {
+    return await this.authorOfProjectsLoader.load(project_id)
   }
 }

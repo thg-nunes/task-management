@@ -13,7 +13,17 @@ const getProject = async (
   { project_id }: { project_id: string },
   { dataSources, req }: Context,
 ) => {
+  userIsAuthenticated(req.headers.cookie)
   return await dataSources.projectsDataSource.getProject(project_id)
+}
+
+const getProjects = async (
+  _,
+  { project_id }: { project_id: string },
+  { dataSources, req }: Context,
+) => {
+  userIsAuthenticated(req.headers.cookie)
+  return await dataSources.projectsDataSource.getProjects()
 }
 
 const viewAllMembersOfProject = async (
@@ -95,7 +105,7 @@ export const updateProject = async (
 }
 
 export const projectsResolvers = {
-  Query: { viewAllMembersOfProject, getProject },
+  Query: { viewAllMembersOfProject, getProject, getProjects },
   Mutation: {
     createProject,
     createProjectMember,
