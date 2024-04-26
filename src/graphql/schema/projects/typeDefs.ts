@@ -9,7 +9,6 @@ export const projectsTypedefs = `#graphql
     members: [ProjectMembersList!]!
   }
 
-
   extend type Mutation {
     createProject(projectData: CreateProjectInput!): Project!
     deleteProject(project_id: String!): DeleteProjectResponse
@@ -33,7 +32,7 @@ export const projectsTypedefs = `#graphql
     members: [ProjectMembers]
     author: User
     author_id: String!
-    tasks: [Task!]
+    tasks: [Task!]!
   }
 
   type ProjectMembers {

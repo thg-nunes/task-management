@@ -1,11 +1,12 @@
 import { Context } from '@context/types'
+import { Task } from '@schema/tasks/types'
+import { userIsAuthenticated } from '@utils/jwt'
 import {
   CreateProjectInput,
   Project,
   UpdateProjectDataInput,
   RemoveMemberOfProjectInpt,
 } from './types'
-import { userIsAuthenticated } from '@utils/jwt'
 
 // Query Resolvers
 const getProject = async (
@@ -104,6 +105,17 @@ export const updateProject = async (
   })
 }
 
+// Field Resolvers
+export const tasks = async (
+  { id }: Project,
+  _,
+  { dataSources, req }: Context,
+): Promise<Task[]> => {
+  userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.projectsDataSource.batchLoadTasksOfProject(id)
+}
+
 export const projectsResolvers = {
   Query: { viewAllMembersOfProject, getProject, getProjects },
   Mutation: {
@@ -113,6 +125,7 @@ export const projectsResolvers = {
     deleteProject,
     updateProject,
   },
+  Project: { tasks },
   CreateProjectMemberResponse: {
     __resolveType: (object) => {
       if (object.usersMembersList) return 'CreateProjectMemberSuccessResponse'

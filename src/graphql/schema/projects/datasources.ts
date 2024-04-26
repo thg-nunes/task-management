@@ -1,6 +1,7 @@
 import { PostgresDataSource } from '@dataSources/postgres'
 
 import { User } from '@schema/users/types'
+import { Task } from '@schema/tasks/types'
 import { AppError } from '@utils/appError'
 
 import * as ProjectTypes from './types'
@@ -43,6 +44,7 @@ export interface PostgresDataSourceMethods {
   batchLoadMemberOfProjects(
     project_id: string,
   ): Promise<Array<ProjectTypes.Project>>
+  batchLoadTasksOfProject(project_id: string): Promise<Array<Task>>
 }
 
 export class ProjectsDataSource
@@ -421,5 +423,25 @@ export class ProjectsDataSource
     project_id: string,
   ): Promise<Array<ProjectTypes.Project>> {
     return await this.memberOfProjectsLoader.load(project_id)
+  }
+
+  private tasksOfProjectLoader = this.createInstanceLoader<Array<Task>>(
+    async (ids) => {
+      const tasksOfProjects = await this.db.tasks.findMany({
+        where: { project_id: { in: ids } },
+      })
+
+      return ids.map((id) => {
+        const tasks: Task[] = []
+        tasksOfProjects.forEach((task) => {
+          if (task.project_id === id) tasks.push(task)
+        })
+        return tasks
+      })
+    },
+  )
+
+  async batchLoadTasksOfProject(project_id: string): Promise<Array<Task>> {
+    return await this.tasksOfProjectLoader.load(project_id)
   }
 }
