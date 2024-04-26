@@ -1,5 +1,5 @@
 import { Project } from '@schema/projects/types'
-import { Comment, Task } from '@schema/tasks/types'
+import { Task } from '@schema/tasks/types'
 
 export type User = Partial<{
   id: string
@@ -9,9 +9,8 @@ export type User = Partial<{
   refresh_token: string
   created_at: Date
   updated_at: Date
-  projects_member: Array<Project>
+  member_of_projects: Array<Project>
   author_of_projects: Array<Project>
-  comments_creted: Array<Comment>
   tasks: Array<Task>
 }>
 
