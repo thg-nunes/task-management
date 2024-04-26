@@ -17,7 +17,7 @@ model Users {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
   projects_member UserMemberOfProjects[]
-  projects_author Projects[]
+  author_of_projects Projects[]
   comments_creted Comments[]
   tasks Tasks[]
 }
