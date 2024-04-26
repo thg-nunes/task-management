@@ -30,7 +30,7 @@ export const projectsTypedefs = `#graphql
     created_at: String
     updated_at: String
     members: [ProjectMembers]
-    author: User
+    author: User!
     author_id: String!
     tasks: [Task!]!
   }

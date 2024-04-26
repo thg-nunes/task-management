@@ -116,6 +116,18 @@ export const tasks = async (
   return await dataSources.projectsDataSource.batchLoadTasksOfProject(id)
 }
 
+export const author = async (
+  { author_id }: Project,
+  _,
+  { dataSources, req }: Context,
+): Promise<Task[]> => {
+  userIsAuthenticated(req.headers.cookie)
+
+  return await dataSources.projectsDataSource.batchLoadAuthorOfProject(
+    author_id,
+  )
+}
+
 export const projectsResolvers = {
   Query: { viewAllMembersOfProject, getProject, getProjects },
   Mutation: {
@@ -125,7 +137,7 @@ export const projectsResolvers = {
     deleteProject,
     updateProject,
   },
-  Project: { tasks },
+  Project: { author, tasks },
   CreateProjectMemberResponse: {
     __resolveType: (object) => {
       if (object.usersMembersList) return 'CreateProjectMemberSuccessResponse'

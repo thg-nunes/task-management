@@ -45,6 +45,7 @@ export interface PostgresDataSourceMethods {
     project_id: string,
   ): Promise<Array<ProjectTypes.Project>>
   batchLoadTasksOfProject(project_id: string): Promise<Array<Task>>
+  batchLoadAuthorOfProject(author_id: string): Promise<Array<User>>
 }
 
 export class ProjectsDataSource
@@ -443,5 +444,27 @@ export class ProjectsDataSource
 
   async batchLoadTasksOfProject(project_id: string): Promise<Array<Task>> {
     return await this.tasksOfProjectLoader.load(project_id)
+  }
+
+  private authorOfProjectLoader = this.createInstanceLoader<Array<User>>(
+    async (ids) => {
+      const authorOfProject = await this.db.users.findMany({
+        where: { id: { in: ids } },
+      })
+
+      const correctAuthorList = []
+
+      ids.map((id) =>
+        authorOfProject.find((author) => {
+          if (author.id === id) return correctAuthorList.push(author)
+        }),
+      )
+
+      return correctAuthorList
+    },
+  )
+
+  async batchLoadAuthorOfProject(author_id: string): Promise<Array<User>> {
+    return await this.authorOfProjectLoader.load(author_id)
   }
 }
