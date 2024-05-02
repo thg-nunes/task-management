@@ -54,10 +54,17 @@ export class UsersDataSource
     return await this.db.users.findMany()
   }
 
-  async createUser(
-    { userData }: CreateUserData,
-    res: ServerResponse<IncomingMessage>,
-  ): Promise<User> {
+  async createUser({ userData }: CreateUserData): Promise<User> {
+    const requiredFields = ['username', 'email', 'password']
+
+    for (const field of requiredFields) {
+      if (!userData[field] || userData[field] === '')
+        throw new AppError(
+          `O campo ${field} é obrigatório e não pode ser nulo.`,
+          'BAD_REQUEST',
+        )
+    }
+
     const emailAlreadyExists = await this.db.users.findUnique({
       where: {
         email: userData.email,
