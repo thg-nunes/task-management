@@ -45,6 +45,23 @@ const signIn = async (
   return user
 }
 
+const refresh_token = async (
+  _,
+  __,
+  { dataSources, req, res }: Context,
+): Promise<boolean> => {
+  const { refresh_token } = returnsTokenAndRefreshToken(req.headers.cookie)
+  const { token, refresh_token: new_refresh_toke } =
+    await dataSources.usersDataSource.refreshToken(refresh_token)
+
+  res.setHeader('Set-Cookie', [
+    `authToken=${token}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+    `refresh_token=${new_refresh_toke}; Domain=localhost; Path=/; HttpOnly; SameSite=Strict`,
+  ])
+
+  return !!token
+}
+
 const signOut = async (_, __, { res }: Context) => {
   res.setHeader('Set-Cookie', [
     `authToken=''; Domain=localhost; Path=/; HttpOnly; Secure; SameSite=Strict, Max-Age=0`,
@@ -125,6 +142,13 @@ const author_of_projects = async (
 
 export const usersResolvers = {
   Query: { getUser, getUsers },
-  Mutation: { sign, signOut, createUser, updateProfile, deleteProfile },
+  Mutation: {
+    signIn,
+    signOut,
+    refresh_token,
+    createUser,
+    updateProfile,
+    deleteProfile,
+  },
   User: { tasks, member_of_projects, author_of_projects },
 }

@@ -10,6 +10,7 @@ export const usersTypeDefs = `#graphql
 
   extend type Mutation {
     signIn(signData: SignInput!): SignResponse!
+    refresh_token: Boolean!
     createUser(userData: CreateUserInput!): User!
     updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
     deleteProfile: Boolean!
