@@ -3,7 +3,7 @@ import { passwordCompareHash, passwordHash } from '@utils/bcrypts'
 
 import { PostgresDataSource } from '@dataSources/postgres'
 import {
-  CreateUserInput,
+  CreateAccountInput,
   SignInput,
   SignResponse,
   User,
@@ -13,7 +13,7 @@ import { createJWT } from '@utils/jwt'
 import { UserIsLoggedIn } from '@schema/users/types'
 import { AppError } from '@utils/appError'
 
-type CreateUserData = Pick<CreateUserInput, 'userData'>
+type CreateAccountData = Pick<CreateAccountInput, 'userData'>
 
 export interface UsersDataSourceMethods {
   getUser(user_id: string): Promise<User>
@@ -23,7 +23,7 @@ export interface UsersDataSourceMethods {
     refresh_token: string
   }>
   deleteProfile(userId: string): Promise<boolean>
-  createUser({ userData }: CreateUserData): Promise<User>
+  createAccount({ userData }: CreateAccountData): Promise<User>
   updateProfile(
     { userUpdateProfile }: UserUpdateProfileInput,
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
@@ -50,7 +50,7 @@ export class UsersDataSource
     return await this.db.users.findMany()
   }
 
-  async createUser({ userData }: CreateUserData): Promise<User> {
+  async createAccount({ userData }: CreateAccountData): Promise<User> {
     const requiredFields = ['username', 'email', 'password']
 
     for (const field of requiredFields) {
@@ -62,9 +62,7 @@ export class UsersDataSource
     }
 
     const emailAlreadyExists = await this.db.users.findUnique({
-      where: {
-        email: userData.email,
-      },
+      where: { email: userData.email },
     })
 
     if (emailAlreadyExists) {
@@ -80,13 +78,7 @@ export class UsersDataSource
 
     const user = await this.db.users.create({
       data: { ...userData },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        created_at: true,
-        updated_at: true,
-      },
+      select: { id: true },
     })
 
     const token = createJWT({ user_id: user.id })

@@ -14,7 +14,7 @@ export type User = Partial<{
   tasks: Array<Task>
 }>
 
-export type CreateUserInput = {
+export type CreateAccountInput = {
   userData: {
     username: string
     email: string

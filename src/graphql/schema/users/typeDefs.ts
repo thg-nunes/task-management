@@ -11,7 +11,7 @@ export const usersTypeDefs = `#graphql
   extend type Mutation {
     signIn(signData: SignInput!): SignResponse!
     refresh_token: Boolean!
-    createUser(userData: CreateUserInput!): User!
+    createAccount(userData: CreateAccountInput!): User!
     updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
     deleteProfile: Boolean!
     signOut: Boolean!
@@ -43,7 +43,7 @@ export const usersTypeDefs = `#graphql
     tasks: [Task]!
   }
 
-  input CreateUserInput {
+  input CreateAccountInput {
     username: String!
     email: String!
     password: String!

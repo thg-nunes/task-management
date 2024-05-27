@@ -1,7 +1,7 @@
 import { Context } from '@context/types'
 import { Task } from '@schema/tasks/types'
 import {
-  CreateUserInput,
+  CreateAccountInput,
   SignInput,
   SignResponse,
   User,
@@ -71,12 +71,12 @@ const signOut = async (_, __, { res }: Context) => {
   return true
 }
 
-const createUser = async (
+const createAccount = async (
   _,
-  { userData }: CreateUserInput,
+  { userData }: CreateAccountInput,
   { dataSources }: Context,
 ) => {
-  return await dataSources.usersDataSource.createUser({ userData })
+  return await dataSources.usersDataSource.createAccount({ userData })
 }
 
 const updateProfile = async (
@@ -146,7 +146,7 @@ export const usersResolvers = {
     signIn,
     signOut,
     refresh_token,
-    createUser,
+    createAccount,
     updateProfile,
     deleteProfile,
   },
