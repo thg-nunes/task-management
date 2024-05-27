@@ -59,7 +59,7 @@ const createUser = async (
   { userData }: CreateUserInput,
   { dataSources, res }: Context,
 ) => {
-  return await dataSources.usersDataSource.createUser({ userData }, res)
+  return await dataSources.usersDataSource.createUser({ userData })
 }
 
 const updateProfile = async (

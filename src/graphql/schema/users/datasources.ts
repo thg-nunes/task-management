@@ -24,10 +24,7 @@ export interface UsersDataSourceMethods {
     refresh_token: string
   }>
   deleteProfile(userEmail: string): Promise<Boolean>
-  createUser(
-    { userData }: CreateUserData,
-    res: ServerResponse<IncomingMessage>,
-  ): Promise<User>
+  createUser({ userData }: CreateUserData): Promise<User>
   updateProfile(
     { userUpdateProfile }: UserUpdateProfileInput,
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
