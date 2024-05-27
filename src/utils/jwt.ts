@@ -7,10 +7,13 @@ export const createJWT = (
   payload: string | object | Buffer,
   options?: jwt.SignOptions,
 ) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, options)
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: '3d',
+    ...options,
+  })
 }
 
-export const userIsAuthenticated = (cookie: string = '') => {
+export const returnsTokenAndRefreshToken = (cookie: string = '') => {
   const tokens = cookie.split('; ')
   let auth_token: string, refresh_token: string
 
@@ -22,14 +25,16 @@ export const userIsAuthenticated = (cookie: string = '') => {
     }
   })
 
+  return { auth_token, refresh_token }
+}
+
+export const userIsAuthenticated = (cookie: string = '') => {
+  const { auth_token } = returnsTokenAndRefreshToken(cookie)
+
   try {
-    const payload = jwt.verify(
-      auth_token,
-      process.env.JWT_SECRET,
-      // { Desativar só quando tiver a lógica de refresh token no front-end, pq aí vai lançar um erro, e o client vai ser responsavel por criar a fila de req e atualizar o token em cada uma delas
-      //   ignoreExpiration: false,
-      // },
-    ) as UserIsLoggedIn
+    const payload = jwt.verify(auth_token, process.env.JWT_SECRET, {
+      ignoreExpiration: false,
+    }) as UserIsLoggedIn
 
     return payload
   } catch (error) {
