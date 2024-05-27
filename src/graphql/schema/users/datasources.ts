@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import { passwordCompareHash, passwordHash } from '@utils/bcrypts'
 
 import { PostgresDataSource } from '@dataSources/postgres'
@@ -83,7 +83,12 @@ export class UsersDataSource
 
     const token = createJWT({ user_id: user.id })
 
-    const refresh_token = createJWT({ user_id: user.id })
+    const refresh_token = createJWT(
+      { user_id: user.id },
+      {
+        expiresIn: '10d',
+      },
+    )
 
     await this.db.users.update({
       where: { id: user.id },
@@ -132,26 +137,46 @@ export class UsersDataSource
     token: string
     refresh_token: string
   }> {
-    const payload = jwt.verify(refresh_token, process.env.JWT_SECRET) as {
-      user_id: string
-      user_email: string
+    try {
+      const { user_id } = jwt.verify(refresh_token, process.env.JWT_SECRET) as {
+        user_id: string
+      }
+
+      const new_token = createJWT({ user_id })
+
+      return await this.db.users.update({
+        data: { token: new_token },
+        where: { id: user_id },
+        select: { token: true, refresh_token: true },
+      })
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        const { user_id, username } = jwt.verify(
+          refresh_token,
+          process.env.JWT_SECRET,
+          {
+            ignoreExpiration: true,
+          },
+        ) as {
+          user_id: string
+          username: string
+        }
+
+        const token = createJWT({ user_id })
+        const _refresh_token = createJWT(
+          { user_id, username },
+          {
+            expiresIn: '10d',
+          },
+        )
+
+        return await this.db.users.update({
+          data: { token, refresh_token: _refresh_token },
+          where: { id: user_id },
+          select: { token: true, refresh_token: true },
+        })
+      }
     }
-
-    const { user_id, user_email } = payload
-
-    const new_token = jwt.sign(
-      { user_id, user_email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '5s', // expires in 5 seconds
-      },
-    )
-
-    return await this.db.users.update({
-      data: { token: new_token },
-      where: { email: payload.user_email },
-      select: { token: true, refresh_token: true },
-    })
   }
 
   async updateProfile(
