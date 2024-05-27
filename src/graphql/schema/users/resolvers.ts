@@ -7,7 +7,7 @@ import {
   User,
   UserUpdateProfileInput,
 } from './types'
-import { userIsAuthenticated } from '@utils/jwt'
+import { returnsTokenAndRefreshToken, userIsAuthenticated } from '@utils/jwt'
 import { Project } from '@schema/projects/types'
 
 // Query Resolvers
@@ -57,7 +57,7 @@ const signOut = async (_, __, { res }: Context) => {
 const createUser = async (
   _,
   { userData }: CreateUserInput,
-  { dataSources, res }: Context,
+  { dataSources }: Context,
 ) => {
   return await dataSources.usersDataSource.createUser({ userData })
 }
@@ -91,7 +91,7 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
   ])
 
   return await dataSources.usersDataSource.deleteProfile(
-    _userIsAuthenticated.user_email,
+    _userIsAuthenticated.user_id,
   )
 }
 

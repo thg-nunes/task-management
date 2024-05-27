@@ -22,7 +22,7 @@ export interface UsersDataSourceMethods {
     token: string
     refresh_token: string
   }>
-  deleteProfile(userEmail: string): Promise<Boolean>
+  deleteProfile(userId: string): Promise<boolean>
   createUser({ userData }: CreateUserData): Promise<User>
   updateProfile(
     { userUpdateProfile }: UserUpdateProfileInput,
@@ -89,12 +89,9 @@ export class UsersDataSource
       },
     })
 
-    const token = createJWT({ user_email: userData.email, user_id: user.id })
+    const token = createJWT({ user_id: user.id })
 
-    const refresh_token = createJWT({
-      user_email: userData.email,
-      user_id: user.id,
-    })
+    const refresh_token = createJWT({ user_id: user.id })
 
     await this.db.users.update({
       where: { id: user.id },
@@ -104,8 +101,8 @@ export class UsersDataSource
     return user
   }
 
-  async deleteProfile(email: string) {
-    const userDeleted = await this.db.users.delete({ where: { email } })
+  async deleteProfile(userId: string) {
+    const userDeleted = await this.db.users.delete({ where: { id: userId } })
     return !!userDeleted.id
   }
 
@@ -212,7 +209,7 @@ export class UsersDataSource
     userUpdateProfile['updated_at'] = new Date().toISOString()
 
     return await this.db.users.update({
-      where: { email: userIsLoggedIn.user_email },
+      where: { id: userIsLoggedIn.user_id },
       data: userUpdateProfile,
       select: {
         id: true,

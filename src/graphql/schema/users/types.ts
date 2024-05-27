@@ -47,5 +47,4 @@ export type SignResponse = {
 
 export type UserIsLoggedIn = {
   user_id: string
-  user_email: string
 }
