@@ -38,6 +38,9 @@ export type SignInput = {
 }
 
 export type SignResponse = {
+  id: string
+  username: string
+  email: string
   token: string
   refresh_token: string
 }

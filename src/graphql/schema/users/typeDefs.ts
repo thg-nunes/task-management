@@ -9,7 +9,7 @@ export const usersTypeDefs = `#graphql
   }
 
   extend type Mutation {
-    sign(signData: SignInput!): SignResponse!
+    signIn(signData: SignInput!): SignResponse!
     createUser(userData: CreateUserInput!): User!
     updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
     deleteProfile: Boolean!
@@ -22,6 +22,9 @@ export const usersTypeDefs = `#graphql
   }
 
   type SignResponse {
+    id: String!
+    username: String!
+    email: String!
     token: String!
     refresh_token: String!
   }

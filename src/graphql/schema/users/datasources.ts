@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import { IncomingMessage, ServerResponse } from 'http'
 import { passwordCompareHash, passwordHash } from '@utils/bcrypts'
 
 import { PostgresDataSource } from '@dataSources/postgres'
@@ -29,7 +28,7 @@ export interface UsersDataSourceMethods {
     { userUpdateProfile }: UserUpdateProfileInput,
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
   ): Promise<User>
-  sign(signData: SignInput): Promise<SignResponse>
+  signIn(signData: SignInput): Promise<SignResponse>
 }
 
 export class UsersDataSource
@@ -110,12 +109,15 @@ export class UsersDataSource
     return !!userDeleted.id
   }
 
-  async sign({ signData }: SignInput): Promise<SignResponse> {
+  async signIn({ signData }: SignInput): Promise<SignResponse> {
     const user = await this.db.users.findUnique({
       where: {
         email: signData.email,
       },
       select: {
+        email: true,
+        id: true,
+        username: true,
         password: true,
         token: true,
         refresh_token: true,
@@ -132,10 +134,9 @@ export class UsersDataSource
     if (!passwordIsCorrect)
       throw new AppError('Email ou senha incorreta.', 'NOT_FOUND')
 
-    return {
-      token: user.token,
-      refresh_token: user.refresh_token,
-    }
+    const { email, id, refresh_token, token, username } = user
+
+    return { email, id, refresh_token, token, username }
   }
 
   async refreshToken(refresh_token: string): Promise<{

@@ -29,20 +29,20 @@ const getUsers = async (
 }
 
 // Mutations Resolvers
-const sign = async (
+const signIn = async (
   _,
   { signData }: SignInput,
   { dataSources, res }: Context,
 ): Promise<SignResponse> => {
-  const { token, refresh_token } = await dataSources.usersDataSource.sign({
+  const user = await dataSources.usersDataSource.signIn({
     signData,
   })
   res.setHeader('Set-Cookie', [
-    `authToken=${token}; Domain=localhost; Path=/; HttpOnly; Secure; SameSite=Strict`,
-    `refresh_token=${refresh_token}; Domain=localhost; Path=/; HttpOnly; Secure; SameSite=Strict`,
+    `authToken=${user.token}; Domain=localhost:3000; Path=/; HttpOnly; SameSite=Strict`,
+    `refresh_token=${user.refresh_token}; Domain=localhost:3000; Path=/; HttpOnly; SameSite=Strict`,
   ])
 
-  return { token, refresh_token }
+  return user
 }
 
 const signOut = async (_, __, { res }: Context) => {
