@@ -14,7 +14,6 @@ export const usersTypeDefs = `#graphql
     createAccount(userData: CreateAccountInput!): User!
     updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
     deleteProfile: Boolean!
-    signOut: Boolean!
   }
 
   input SignInput {

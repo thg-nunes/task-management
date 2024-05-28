@@ -62,15 +62,6 @@ const refresh_token = async (
   return !!token
 }
 
-const signOut = async (_, __, { res }: Context) => {
-  res.setHeader('Set-Cookie', [
-    `authToken=''; Domain=localhost; Path=/; HttpOnly; Secure; SameSite=Strict, Max-Age=0`,
-    `refresh_token=''; Domain=localhost; Path=/; HttpOnly; Secure; SameSite=Strict, Max-Age=0`,
-  ])
-
-  return true
-}
-
 const createAccount = async (
   _,
   { userData }: CreateAccountInput,
@@ -144,7 +135,6 @@ export const usersResolvers = {
   Query: { getUser, getUsers },
   Mutation: {
     signIn,
-    signOut,
     refresh_token,
     createAccount,
     updateProfile,
