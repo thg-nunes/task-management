@@ -13,10 +13,10 @@ import { Project } from '@schema/projects/types'
 // Query Resolvers
 const getUser = async (
   _,
-  { user_id }: { user_id: string },
+  { email }: { email: string },
   { dataSources }: Context,
 ): Promise<User> => {
-  return await dataSources.usersDataSource.getUser(user_id)
+  return await dataSources.usersDataSource.getUser(email)
 }
 
 const getUsers = async (
@@ -75,6 +75,7 @@ const updateProfile = async (
   { userUpdateProfile }: UserUpdateProfileInput,
   { dataSources, req, res }: Context,
 ) => {
+  // COMEÇAR A TRABALHAR NO UPDATE PROFILE
   const _userIsAuthenticated = userIsAuthenticated(req.headers.cookie)
 
   const userDataUpdated = await dataSources.usersDataSource.updateProfile(

@@ -4,7 +4,7 @@
 
 export const usersTypeDefs = `#graphql
   extend type Query {
-    getUser(user_id: String!): User!
+    getUser(email: String!): User!
     getUsers: [User!]!
   }
 

@@ -16,7 +16,7 @@ import { AppError } from '@utils/appError'
 type CreateAccountData = Pick<CreateAccountInput, 'userData'>
 
 export interface UsersDataSourceMethods {
-  getUser(user_id: string): Promise<User>
+  getUser(email: string): Promise<User>
   getUsers(): Promise<Partial<Array<User>>>
   refreshToken(refresh_token: string): Promise<{
     token: string
@@ -38,10 +38,10 @@ export class UsersDataSource
   constructor() {
     super()
   }
-  async getUser(user_id: string): Promise<Partial<User>> {
-    const user = await this.db.users.findUnique({ where: { id: user_id } })
+  async getUser(email: string): Promise<Partial<User>> {
+    const user = await this.db.users.findUnique({ where: { email: email } })
     if (!user)
-      throw new AppError(`User "${user_id}" não encontrado.`, 'NOT_FOUND')
+      throw new AppError(`User "${email}" não encontrado.`, 'NOT_FOUND')
 
     return user
   }
@@ -90,12 +90,11 @@ export class UsersDataSource
       },
     )
 
-    await this.db.users.update({
+    return await this.db.users.update({
       where: { id: user.id },
       data: { token, refresh_token },
+      select: { token: true, refresh_token: true, email: true, username: true },
     })
-
-    return user
   }
 
   async deleteProfile(userId: string) {
