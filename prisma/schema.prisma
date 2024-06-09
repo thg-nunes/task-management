@@ -82,3 +82,12 @@ model Comments {
 
   @@unique([task_id, user_id])
 }
+
+model Avatar {
+  id        Int      @id @default(autoincrement()) 
+  filename  String
+  mimetype  String
+  data      Bytes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
