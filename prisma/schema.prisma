@@ -20,6 +20,7 @@ model Users {
   author_of_projects Projects[]
   comments_creted Comments[]
   tasks Tasks[]
+  avatar Avatar[]
 }
 
 model Projects {
@@ -84,10 +85,12 @@ model Comments {
 }
 
 model Avatar {
-  id        Int      @id @default(autoincrement()) 
-  filename  String
-  mimetype  String
-  data      Bytes
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-}
+  id           Int      @id @default(autoincrement()) 
+  user         Users    @relation(fields: [user_email], references: [email])
+  user_email   String
+  filename     String
+  mimetype     String
+  data         Bytes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+} 
