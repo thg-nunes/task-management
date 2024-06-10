@@ -86,8 +86,8 @@ model Comments {
 
 model Avatar {
   id           Int      @id @default(autoincrement()) 
-  user         Users    @relation(fields: [user_email], references: [email])
-  user_email   String
+  user         Users    @relation(fields: [user_id], references: [id])
+  user_id      String
   filename     String
   mimetype     String
   data         Bytes
