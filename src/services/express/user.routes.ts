@@ -64,6 +64,22 @@ async function uploadAvatar({
   }
 }
 
+userRoutes.get('/avatar/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params
+
+    const avatar = await prisma.avatar.findFirst({
+      where: { user_id },
+      select: { mimetype: true, data: true },
+    })
+
+    res.setHeader('Content-Type', avatar.mimetype)
+    res.send(avatar.data)
+  } catch (error) {
+    return res.status(500).json({ message: 'Erro ao buscar o arquivo' })
+  }
+})
+
 /** Rota responsável por fazer o upload do avatar do usuário */
 userRoutes.post('/upload', upload.single('file'), async (req, res) => {
   const user_id = req.headers.user_id as string
