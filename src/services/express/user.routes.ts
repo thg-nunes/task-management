@@ -40,20 +40,21 @@ async function uploadAvatar({
   data,
   filename,
   mimetype,
-  user_email,
+  user_id,
 }: {
-  user_email: string
+  user_id: string
   filename: string
   mimetype: string
   data: Buffer
 }) {
   try {
     const avatar = await prisma.avatar.create({
-      data: { filename, mimetype, data, user_email },
+      data: { filename, mimetype, data, user_id },
       select: {
         data: true,
         filename: true,
         mimetype: true,
+        user_id: true,
       },
     })
 
@@ -65,13 +66,13 @@ async function uploadAvatar({
 
 /** Rota responsável por fazer o upload do avatar do usuário */
 userRoutes.post('/upload', upload.single('file'), async (req, res) => {
-  const user_email = req.headers.email as string
+  const user_id = req.headers.user_id as string
 
   // @ts-ignore - o file é adicionado o objeto de request pelo multer, por isso vai existir
   if (!req.file) badRequest({ res, message: 'Nenhum arquivo enviado.' })
 
-  if (!req.headers.email)
-    badRequest({ res, message: 'O email do usuário é obrigatório.' })
+  if (!req.headers.user_id)
+    badRequest({ res, message: 'O id do usuário é obrigatório.' })
 
   // @ts-ignore - o file é adicionado o objeto de request pelo multer, por isso vai existir
   const { originalname, mimetype, destination, filename } = req.file
@@ -82,7 +83,7 @@ userRoutes.post('/upload', upload.single('file'), async (req, res) => {
 
     // Salva o arquivo no banco de dados
     const avatar = await uploadAvatar({
-      user_email,
+      user_id,
       mimetype,
       data: binaryAvatar,
       filename: originalname,
@@ -93,7 +94,7 @@ userRoutes.post('/upload', upload.single('file'), async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: 'Arquivo enviado com sucesso', avatar })
+      .json({ message: 'Arquivo enviado com sucesso', user_id: avatar.user_id })
   } catch (error) {
     serverError({ res, message: 'Erro ao fazer upload do arquivo' })
   }
