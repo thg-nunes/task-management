@@ -1,54 +1,46 @@
-import cors from 'cors'
-import multer from 'multer'
-import express from 'express'
-import { ApolloServer } from 'apollo-server-express'
+import { Express } from 'express'
+import { ApolloServer } from '@apollo/server'
+import { expressMiddleware } from '@apollo/server/express4'
+
+import { Context } from '@context/types'
+
+import { expressApp } from './services/express'
 
 import { resolvers, typeDefs } from '@schema/index'
+import { TaskDataSource } from '@schema/tasks/datasouce'
 import { UsersDataSource } from '@schema/users/datasources'
 import { ProjectsDataSource } from '@schema/projects/datasources'
-import { TaskDataSource } from '@schema/tasks/datasouce'
 
-const app = express()
-const upload = multer({ dest: 'uploads/' })
-
-async function startServer() {
-  const server = new ApolloServer({
+async function startServer({ expressApp }: { expressApp: Express }) {
+  const server = new ApolloServer<Context>({
     typeDefs,
     resolvers,
-    context: async ({ req, res }) => {
-      return {
-        req,
-        res,
-        dataSources: {
-          taskDataSource: new TaskDataSource(),
-          usersDataSource: new UsersDataSource(),
-          projectsDataSource: new ProjectsDataSource(),
-        },
-      }
-    },
   })
 
   await server.start()
 
-  // Aplicar middleware do Apollo Server
-  server.applyMiddleware({ app })
-
-  app.use(
-    cors({
-      credentials: true,
-      origin: [`${process.env.FRONT_END_ENDPOINT}`],
+  expressApp.use(
+    '/graphql/api/',
+    expressMiddleware(server, {
+      context: async ({ req, res }) => {
+        return {
+          req,
+          res,
+          dataSources: {
+            taskDataSource: new TaskDataSource(),
+            usersDataSource: new UsersDataSource(),
+            projectsDataSource: new ProjectsDataSource(),
+          },
+        }
+      },
     }),
   )
 
-  app.post('/upload', upload.single('avatar'), (req, res) => {
-    return res.status(200).json({ message: 'Arquivo recebido com sucesso' })
-  })
-
-  app.listen({ port: process.env.SERVER_PORT }, () => {
+  expressApp.listen(process.env.SERVER_PORT, () =>
     console.log(
-      `🚀 server listening: http://localhost:${process.env.SERVER_PORT}/ and sandbox listening: http://localhost:${process.env.SERVER_PORT}/graphql`,
-    )
-  })
+      `server listening: http://localhost:${process.env.SERVER_PORT}/graphql/api/`,
+    ),
+  )
 }
 
-startServer()
+startServer({ expressApp })
