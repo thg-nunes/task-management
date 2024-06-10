@@ -1,3 +1,4 @@
+import path from 'path'
 import multer from 'multer'
 import fs from 'fs/promises'
 import { Router } from 'express'
@@ -6,10 +7,24 @@ import { prisma } from '../prisma'
 
 import { badRequest } from '@utils/http/bad-request'
 import { serverError } from '@utils/http/server-error'
-import { ApolloServer } from '@apollo/server'
 
 const userRoutes = Router()
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({
+  dest: 'uploads/',
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase(),
+    )
+    const mimetype = filetypes.test(file.mimetype)
+
+    if (mimetype && extname) {
+      return cb(null, true)
+    }
+
+    cb(new Error('Apenas arquivos jpeg, jpg e png são permitidos!'))
+  },
+})
 
 /**
  * @async
