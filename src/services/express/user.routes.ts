@@ -48,6 +48,14 @@ async function uploadAvatar({
   data: Buffer
 }) {
   try {
+    const avatarAlreadyExists = await prisma.avatar.findFirst({
+      where: { user_id },
+    })
+
+    if (avatarAlreadyExists) {
+      return await prisma.avatar.update({ data: { data }, where: { user_id } })
+    }
+
     const avatar = await prisma.avatar.create({
       data: { filename, mimetype, data, user_id },
       select: {
@@ -72,6 +80,8 @@ userRoutes.get('/avatar/:user_id', async (req, res) => {
       where: { user_id },
       select: { mimetype: true, data: true },
     })
+
+    if (!avatar) return
 
     res.setHeader('Content-Type', avatar.mimetype)
     res.send(avatar.data)
