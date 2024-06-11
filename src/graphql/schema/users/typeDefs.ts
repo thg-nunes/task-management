@@ -1,7 +1,3 @@
-// [] criar um campo na db para adicionar uma foto
-// [] no updateProfile criar um campo para receber um foto
-// [] armazenar a foto na db
-
 export const usersTypeDefs = `#graphql
   extend type Query {
     getUser(email: String!): User!
@@ -11,7 +7,7 @@ export const usersTypeDefs = `#graphql
   extend type Mutation {
     signIn(signData: SignInput!): SignResponse!
     refresh_token: Boolean!
-    createAccount(userData: CreateAccountInput!): User!
+    createAccount(userData: CreateAccountInput!): SignResponse!
     updateProfile(userUpdateProfile: UserUpdateProfileInput!): User!
     deleteProfile: Boolean!
   }

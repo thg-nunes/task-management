@@ -23,7 +23,7 @@ export interface UsersDataSourceMethods {
     refresh_token: string
   }>
   deleteProfile(userId: string): Promise<boolean>
-  createAccount({ userData }: CreateAccountData): Promise<User>
+  createAccount({ userData }: CreateAccountData): Promise<SignResponse>
   updateProfile(
     { userUpdateProfile }: UserUpdateProfileInput,
     { userIsLoggedIn }: { userIsLoggedIn: UserIsLoggedIn },
@@ -50,7 +50,7 @@ export class UsersDataSource
     return await this.db.users.findMany()
   }
 
-  async createAccount({ userData }: CreateAccountData): Promise<User> {
+  async createAccount({ userData }: CreateAccountData): Promise<SignResponse> {
     const requiredFields = ['username', 'email', 'password']
 
     for (const field of requiredFields) {
@@ -93,7 +93,13 @@ export class UsersDataSource
     return await this.db.users.update({
       where: { id: user.id },
       data: { token, refresh_token },
-      select: { token: true, refresh_token: true, email: true, username: true },
+      select: {
+        id: true,
+        token: true,
+        refresh_token: true,
+        email: true,
+        username: true,
+      },
     })
   }
 
