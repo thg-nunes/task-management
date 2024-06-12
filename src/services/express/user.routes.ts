@@ -53,35 +53,33 @@ async function uploadAvatar({
     })
 
     if (avatarAlreadyExists) {
-      return await prisma.avatar.update({ data: { data }, where: { user_id } })
+      await prisma.avatar.delete({ where: { user_id } })
+
+      return await prisma.avatar.create({
+        data: { filename, mimetype, data, user_id },
+        select: { id: true },
+      })
     }
 
-    const avatar = await prisma.avatar.create({
+    return await prisma.avatar.create({
       data: { filename, mimetype, data, user_id },
-      select: {
-        data: true,
-        filename: true,
-        mimetype: true,
-        user_id: true,
-      },
+      select: { id: true },
     })
-
-    return avatar
   } catch (error) {
     throw new Error(`Erro ao fazer upload do arquivo: ${error}`)
   }
 }
 
-userRoutes.get('/avatar/:user_id', async (req, res) => {
+userRoutes.get('/avatar/:user_id/:avatar_id?', async (req, res) => {
   try {
     const { user_id } = req.params
 
-    const avatar = await prisma.avatar.findFirst({
+    const avatar = await prisma.avatar.findUnique({
       where: { user_id },
       select: { mimetype: true, data: true },
     })
 
-    if (!avatar) return
+    if (!avatar) return res.status(200).send()
 
     res.setHeader('Content-Type', avatar.mimetype)
     res.send(avatar.data)
@@ -120,7 +118,7 @@ userRoutes.post('/upload', upload.single('file'), async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: 'Arquivo enviado com sucesso', user_id: avatar.user_id })
+      .json({ message: 'Arquivo enviado com sucesso', avatar_id: avatar.id })
   } catch (error) {
     serverError({ res, message: 'Erro ao fazer upload do arquivo' })
   }
