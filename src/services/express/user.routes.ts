@@ -53,9 +53,11 @@ async function uploadAvatar({
     })
 
     if (avatarAlreadyExists) {
+      const updatedAt = new Date()
+
       return await prisma.avatar.update({
         where: { user_id },
-        data: { filename, mimetype, data },
+        data: { filename, mimetype, data, updatedAt },
         select: { id: true },
       })
     }
