@@ -11,6 +11,7 @@ export type User = Partial<{
   updated_at: Date
   member_of_projects: Array<Project>
   author_of_projects: Array<Project>
+  avatarId: string
   tasks: Array<Task>
 }>
 
