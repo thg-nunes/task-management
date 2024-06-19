@@ -91,7 +91,7 @@ export class UsersDataSource
       },
     )
 
-    return await this.db.users.update({
+    const userWithTokenAndRefreshToken = await this.db.users.update({
       where: { id: user.id },
       data: { token, refresh_token },
       select: {
@@ -102,6 +102,8 @@ export class UsersDataSource
         username: true,
       },
     })
+
+    return { ...userWithTokenAndRefreshToken, avatarId: undefined }
   }
 
   async deleteProfile(userId: string) {
@@ -134,7 +136,16 @@ export class UsersDataSource
     if (!passwordIsCorrect)
       throw new AppError('Email ou senha incorreta.', 'NOT_FOUND')
 
+    const avatar = await this.db.avatar.findUnique({
+      where: { user_id: user.id },
+      select: { id: true },
+    })
+
     const { email, id, refresh_token, token, username } = user
+
+    if (avatar) {
+      return { email, id, refresh_token, token, username, avatarId: avatar.id }
+    }
 
     return { email, id, refresh_token, token, username }
   }

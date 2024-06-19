@@ -22,6 +22,7 @@ export const usersTypeDefs = `#graphql
     username: String!
     email: String!
     token: String!
+    avatarId: Int
     refresh_token: String!
   }
 

@@ -11,7 +11,7 @@ export type User = Partial<{
   updated_at: Date
   member_of_projects: Array<Project>
   author_of_projects: Array<Project>
-  avatarId: string
+  avatarId?: number
   tasks: Array<Task>
 }>
 
@@ -44,6 +44,7 @@ export type SignResponse = {
   email: string
   token: string
   refresh_token: string
+  avatarId?: number
 }
 
 export type UserIsLoggedIn = {
