@@ -7,6 +7,7 @@ import { prisma } from '../prisma'
 
 import { badRequest } from '@utils/http/bad-request'
 import { serverError } from '@utils/http/server-error'
+import { ok } from '@utils/http/ok'
 
 const userRoutes = Router()
 const upload = multer({
@@ -87,6 +88,18 @@ userRoutes.get('/avatar/:user_id/:avatar_id?', async (req, res) => {
     res.send(avatar.data)
   } catch (error) {
     return res.status(500).json({ message: 'Erro ao buscar o arquivo' })
+  }
+})
+
+userRoutes.delete('/avatar/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params
+
+    await prisma.avatar.delete({ where: { user_id } })
+
+    return ok({ res, message: 'Avatar deletado.' })
+  } catch (error) {
+    return res.status(500).json({ message: 'Erro ao deletar seu avatar.' })
   }
 })
 
