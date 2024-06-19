@@ -7,7 +7,10 @@ const expressApp = express()
 expressApp.use(
   cors({
     credentials: true,
-    origin: [`${process.env.FRONT_END_ENDPOINT}`],
+    origin: [
+      `${process.env.FRONT_END_ENDPOINT}`,
+      `${process.env.FRONT_END_MOBILE_EMULATOR_ENDPOINT}`,
+    ],
   }),
 )
 
