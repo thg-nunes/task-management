@@ -86,7 +86,7 @@ model Comments {
 
 model Avatar {
   id           Int      @id @default(autoincrement()) 
-  user         Users    @relation(fields: [user_id], references: [id])
+  user         Users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id      String   @unique
   filename     String
   mimetype     String
