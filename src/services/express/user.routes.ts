@@ -53,10 +53,9 @@ async function uploadAvatar({
     })
 
     if (avatarAlreadyExists) {
-      await prisma.avatar.delete({ where: { user_id } })
-
-      return await prisma.avatar.create({
-        data: { filename, mimetype, data, user_id },
+      return await prisma.avatar.update({
+        where: { user_id },
+        data: { filename, mimetype, data },
         select: { id: true },
       })
     }
@@ -66,6 +65,7 @@ async function uploadAvatar({
       select: { id: true },
     })
   } catch (error) {
+    console.log(error)
     throw new Error(`Erro ao fazer upload do arquivo: ${error}`)
   }
 }
