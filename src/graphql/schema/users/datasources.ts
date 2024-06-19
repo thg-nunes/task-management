@@ -23,6 +23,7 @@ export interface UsersDataSourceMethods {
     refresh_token: string
   }>
   deleteProfile(userId: string): Promise<boolean>
+  batchLoadAvatarId(id: string): Promise<number[]>
   createAccount({ userData }: CreateAccountData): Promise<SignResponse>
   updateProfile(
     { userUpdateProfile }: UserUpdateProfileInput,
@@ -243,5 +244,21 @@ export class UsersDataSource
         updated_at: true,
       },
     })
+  }
+
+  private avatarIdLoader = this.createInstanceLoader<number[]>(async (ids) => {
+    const _ids = ids as string[]
+    const userAvatarId = await this.db.avatar.findMany({
+      where: { user_id: { in: _ids } },
+      select: { id: true },
+    })
+
+    return _ids.map((id) =>
+      userAvatarId.filter((avatarId) => avatarId.id === parseInt(id)),
+    )
+  })
+
+  batchLoadAvatarId(id: string): Promise<number[]> {
+    return this.avatarIdLoader.load(id)
   }
 }

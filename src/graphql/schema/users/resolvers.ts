@@ -105,6 +105,15 @@ const deleteProfile = async (_, __, { dataSources, req, res }: Context) => {
 }
 
 // Field Resolvers
+const avatarId = async (
+  { id }: User,
+  __,
+  { dataSources, req }: Context,
+): Promise<number[]> => {
+  userIsAuthenticated(req.headers.cookie)
+  return dataSources.usersDataSource.batchLoadAvatarId(id)
+}
+
 const tasks = async (
   { id }: User,
   __,
@@ -141,5 +150,5 @@ export const usersResolvers = {
     updateProfile,
     deleteProfile,
   },
-  User: { tasks, member_of_projects, author_of_projects },
+  User: { tasks, member_of_projects, author_of_projects, avatarId },
 }
